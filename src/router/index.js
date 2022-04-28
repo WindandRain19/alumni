@@ -14,6 +14,8 @@ import ShowSecond from "../views/Home/Show/ShowSecond.vue";
 import ForumFirst from "../views/Home/Forum/ForumFirst.vue";
 import ForumSecond from "../views/Home/Forum/ForumSecond.vue";
 
+import Cookies from "js-cookie";
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -116,7 +118,7 @@ const router = new VueRouter({
 // 路由导航守卫
 router.beforeEach((to, from, next) => {
   if (to.path === "/Login") return next();
-  const tokenStr = window.sessionStorage.getItem("token");
+  const tokenStr = Cookies.get("Token")
   if (!tokenStr) return next("/Login");
   next();
 });

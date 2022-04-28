@@ -3,8 +3,8 @@
     <!-- 面包屑导航区 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/Home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>论坛管理</el-breadcrumb-item>
-      <el-breadcrumb-item>论坛</el-breadcrumb-item>
+      <el-breadcrumb-item>留言板管理</el-breadcrumb-item>
+      <el-breadcrumb-item>留言板管理</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- 卡片区 -->
@@ -63,10 +63,10 @@ export default {
   data() {
     return {
       ForumList: [],
-      img1: process.env.VUE_APP_UPLOAD_URL3,
-      img2: process.env.VUE_APP_UPLOAD_URL4,
-      img3: process.env.VUE_APP_UPLOAD_URL5,
-      img4: process.env.VUE_APP_UPLOAD_URL6,
+      img1: process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE1,
+      img2: process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE2,
+      img3: process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE3,
+      img4: process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE3,
     };
   },
   methods: {
@@ -79,9 +79,9 @@ export default {
         this.$message.success("数据获取成功");
       }
     },
-    async handleRemove(idforum){
+    async handleRemove(idforum) {
       console.log(idforum);
-            // 弹框
+      // 弹框
       const confirmResult = await this.$confirm(
         "此操作将永久删除该用户, 是否继续?",
         "提示",
@@ -94,11 +94,13 @@ export default {
       if (confirmResult !== "confirm") {
         return this.$message.info("已经取消删除");
       }
-      const { data :res} = await this.$http.delete("/Home/ForumSecond/"+idforum)
+      const { data: res } = await this.$http.delete(
+        "/Home/ForumSecond/" + idforum
+      );
       if (res.meta.status !== 200) return this.$message.error("删除用户失败");
       this.$message.success("删除用户成功");
       this.getForum();
-    }
+    },
   },
 };
 </script>

@@ -26,71 +26,117 @@
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="registerForm.name" style="width: 30%"></el-input>
-        </el-form-item>
-        <el-form-item label="性别" prop="sex">
-          <el-radio-group v-model="registerForm.sex">
-            <el-radio label="男"></el-radio>
-            <el-radio label="女"></el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="学号" prop="number">
-          <el-input v-model="registerForm.number" style="width: 30%"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input
-            v-model="registerForm.password"
-            style="width: 30%"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="电话" prop="telephone">
-          <el-input
-            v-model="registerForm.telephone"
-            style="width: 30%"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="现住址" prop="address">
-          <el-input
-            v-model="registerForm.address"
-            style="width: 50%"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="职称" prop="title">
-          <el-input v-model="registerForm.title" style="width: 40%"></el-input>
-        </el-form-item>
-        <el-form-item label="公司名称" prop="company">
-          <el-input
-            v-model="registerForm.company"
-            style="width: 50%"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="公司地址" prop="work_address">
-          <el-input
-            v-model="registerForm.work_address"
-            style="width: 50%"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="学院和班级" prop="collegeClass">
-          <div class="block">
-            <el-cascader
-              :options="options"
-              :props="{ checkStrictly: true }"
-              clearable
-              v-model="registerForm.collegeClass"
-            ></el-cascader>
-          </div>
-        </el-form-item>
-        <el-form-item label="毕业时间" prop="time">
-          <el-col :span="11">
-            <el-date-picker
-              type="date"
-              placeholder="选择日期"
-              v-model="registerForm.time"
-              style="width: 100%"
-            ></el-date-picker>
-          </el-col>
-        </el-form-item>
+        <table Width="100%">
+          <tr>
+            <th>
+              <el-form-item label="姓名" prop="name">
+                <el-input
+                  v-model="registerForm.name"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="性别" prop="sex">
+                <el-radio-group v-model="registerForm.sex">
+                  <el-radio label="男"></el-radio>
+                  <el-radio label="女"></el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="学号" prop="number">
+                <el-input
+                  v-model="registerForm.number"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="密码" prop="password">
+                <el-input
+                  v-model="registerForm.password"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="电话" prop="telephone">
+                <el-input
+                  v-model="registerForm.telephone"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="现住址" prop="address">
+                <el-input
+                  v-model="registerForm.address"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="职称" prop="title">
+                <el-input
+                  v-model="registerForm.title"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="公司名称" prop="company">
+                <el-input
+                  v-model="registerForm.company"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="公司地址" prop="work_address">
+                <el-input
+                  v-model="registerForm.work_address"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="学院和班级" prop="collegeClass">
+                <div class="block">
+                  <el-cascader
+                    :options="options"
+                    :props="{ checkStrictly: true }"
+                    clearable
+                    v-model="registerForm.collegeClass"
+                  ></el-cascader>
+                </div>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="毕业时间" prop="time">
+                <el-col :span="11">
+                  <el-date-picker
+                    type="date"
+                    placeholder="选择日期"
+                    v-model="registerForm.time"
+                    style="width: 100%"
+                  ></el-date-picker>
+                </el-col>
+              </el-form-item>
+            </th>
+          </tr>
+        </table>
+
         <el-form-item>
           <el-button type="primary" @click="onSubmit">立即创建</el-button>
         </el-form-item>
@@ -228,7 +274,7 @@ export default {
   line-height: 150px;
   text-align: center;
   font-size: 60px;
-  color: #000;
+  color: rgb(238, 116, 22);
 }
 .card {
   width: 800px;

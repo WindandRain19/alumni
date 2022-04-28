@@ -181,7 +181,7 @@ export default {
         this.updateForm.collegeClass = [];
         this.updateForm.collegeClass.push(res.data[0].college);
         this.updateForm.collegeClass.push(res.data[0].class);
-        this.imageUrl = process.env.VUE_APP_UPLOAD_URL7 + res.data[0].photo;
+        this.imageUrl = process.env.VUE_APP_UPLOAD_URL_HEAD_PORTRAIT + res.data[0].photo;
         console.log(this.imageUrl);
         this.$message.success("获取信息成功");
       }
@@ -196,7 +196,6 @@ export default {
       this.dialogImageUrl = this.imageUrl;
     },
     async onSubmit() {
-      //   this.$refs.upload.submit();
       const { data: res } = await this.$http.put(
         "/Home/UserSecond/up/" + this.updateForm.number,
         this.updateForm

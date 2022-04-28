@@ -29,14 +29,14 @@
       <el-table :data="requestList" border stripe>
         <el-table-column label="#" type="index"></el-table-column>
         <el-table-column label="活动名称" prop="name"></el-table-column>
-        <el-table-column label="负责人" prop="user"></el-table-column>
+        <el-table-column label="负责人" width="120px" prop="user"></el-table-column>
         <el-table-column label="电话" prop="telephone"></el-table-column>
-        <el-table-column label="活动区域" prop="region"></el-table-column>
-        <el-table-column label="活动日期" prop="date1"></el-table-column>
-        <el-table-column label="活动具体时间" prop="date2"></el-table-column>
+        <el-table-column label="活动区域" width="100px" prop="region"></el-table-column>
+        <el-table-column label="活动日期" width="120px" prop="date1"></el-table-column>
+        <el-table-column label="活动具体时间" width="120px" prop="date2"></el-table-column>
         <el-table-column label="活动性质" prop="type"></el-table-column>
         <el-table-column label="活动简介" prop="introduction"></el-table-column>
-        <el-table-column label="状态" prop="status">
+        <el-table-column label="状态" width="80px" prop="status">
              <template slot-scope="scope">
         <el-tag
           :type="scope.row.status === '未通过' ? 'danger' : 'success'"

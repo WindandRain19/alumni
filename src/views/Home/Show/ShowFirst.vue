@@ -12,7 +12,7 @@
       <!-- 校友风采列表去 -->
       <el-table :data="showUsersList" border stripe>
         <el-table-column label="#" type="index"></el-table-column>
-        <el-table-column label="图片">
+        <el-table-column label="图片" width="200px">
           <template slot-scope="scope">
             <img
               :src="imgUrl + scope.row.picName"
@@ -21,9 +21,9 @@
             />
           </template>
         </el-table-column>
-        <el-table-column label="姓名" prop="name"></el-table-column>
+        <el-table-column label="姓名" width="120px" prop="name"></el-table-column>
         <el-table-column label="简介" prop="info"> </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="120px">
           <template slot-scope="scope">
             <el-tooltip
               effect="dark"
@@ -77,8 +77,8 @@ export default {
       },
       showUsersList: [],
       total: 0,
-      imgUrl: process.env.VUE_APP_UPLOAD_URL1,
-      pdfUrl: process.env.VUE_APP_UPLOAD_URL2,
+      imgUrl: process.env.VUE_APP_UPLOAD_URL_SHOW_PICTURES,
+      pdfUrl: process.env.VUE_APP_UPLOAD_URL_SHOW_DOCUMENT,
 
 
     };

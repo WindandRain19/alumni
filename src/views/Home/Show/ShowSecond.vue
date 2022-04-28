@@ -180,8 +180,8 @@ export default {
       },
       showUsersList: [],
       total: 0,
-      imgUrl: process.env.VUE_APP_UPLOAD_URL1,
-      pdfUrl: process.env.VUE_APP_UPLOAD_URL2,
+      imgUrl: process.env.VUE_APP_UPLOAD_URL_SHOW_PICTURES,
+      pdfUrl: process.env.VUE_APP_UPLOAD_URL_SHOW_DOCUMENT,
       // 修改用户对话框的显示/隐藏
       editDialogVisible: false,
       // 修改用户查询的表单数据

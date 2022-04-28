@@ -3,8 +3,8 @@
     <!-- 面包屑导航区 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/Home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>论坛管理</el-breadcrumb-item>
-      <el-breadcrumb-item>论坛</el-breadcrumb-item>
+      <el-breadcrumb-item>留言板管理</el-breadcrumb-item>
+      <el-breadcrumb-item>留言板</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- 卡片区 -->
@@ -162,25 +162,16 @@ export default {
         Authorization: window.sessionStorage.getItem("token"),
       },
       data:{},
-      photoImg:process.env.VUE_APP_UPLOAD_URL1,
-      img1:process.env.VUE_APP_UPLOAD_URL3,
-      img2:process.env.VUE_APP_UPLOAD_URL4,
-      img3:process.env.VUE_APP_UPLOAD_URL5,
-      img4:process.env.VUE_APP_UPLOAD_URL6,
+      photoImg:process.env.VUE_APP_UPLOAD_URL_SHOW_PICTURES,
+      img1:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE1,
+      img2:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE2,
+      img3:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE3,
+      img4:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE3,
       give:"",
-      // isAcitve:"",
-      // iClass1:'el-icon-star-on',
+
     }
   },
   methods:{
-    // iChange(){
-    //   this.isAcitve=!this.isAcitve
-    //   if (this.isAcitve) {
-    //     this.iClass1 = 'el-icon-star-on iStyle'
-    //   }else{
-    //     this.iClass1 = 'el-icon-star-on'
-    //   }
-    // },
     async handleGive(give,time){
       const {data : res } = await this.$http.post("/Home/ForumSecond/give",{
         give,time
@@ -195,7 +186,6 @@ export default {
         this.$message.error('数据获取失败')
       }else{
         this.data=res.data
-        // this.$message.success('数据获取成功')
       }
     },
     showEditDialog(){

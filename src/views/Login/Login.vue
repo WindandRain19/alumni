@@ -1,45 +1,76 @@
 <template>
-  <div class="login_container">
-    <div class="login_box">
-      <!-- 头像 -->
-      <div class="avatar_box">
-        <img src="../../assets/logo.png" alt="" />
-      </div>
-      <!-- 登录表单 -->
-      <el-form
-        ref="loginFormRef"
-        label-width="60px"
-        class="login_form"
-        :model="loginForm"
-        :rules="loginFormRules"
-      >
-        <!-- 用户名 -->
-        <el-form-item label="账号" prop="number">
+  <div class="login">
+    <el-card class="box-card">
+      <h3 class="title">校友服务管理系统</h3>
+      <el-form ref="loginForm" :model="loginForm" :rules="loginRules">
+        <el-form-item label="用户类型">
+          <el-select v-model="loginForm.type" placeholder="用户类型">
+            <el-option label="超级管理员" value="超级管理员"></el-option>
+            <el-option label="校友办职员" value="校友办职员"></el-option>
+            <el-option label="学生" value="学生"></el-option>
+            <el-option label="教师" value="教师"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="账号:" style="width: 500px" prop="number">
           <el-input
-            prefix-icon="el-icon-user-solid"
             v-model="loginForm.number"
+            placeholder="请输入账号"
+            style="width: 80%"
           ></el-input>
         </el-form-item>
-        <!-- 密码 -->
-        <el-form-item label="密码" prop="password">
+        <el-form-item label="密码:" style="width: 500px" prop="password">
           <el-input
-            prefix-icon="el-icon-lock"
-            show-password
             v-model="loginForm.password"
+            placeholder="请输入账号"
+            style="width: 80%"
           ></el-input>
         </el-form-item>
-        <!-- 按钮 -->
-        <el-form-item class="btns">
-          <el-button type="primary" @click="login">登录</el-button>
-          <el-button type="info" @click="Register">注册</el-button>
+        <el-form-item prop="img_code" label="验证码:">
+          <el-input
+            v-model="loginForm.img_code"
+            auto-complete="off"
+            placeholder="验证码"
+            style="width: 40%"
+            @keyup.enter.native="handleLogin"
+          >
+          </el-input>
+          <div class="login-code">
+            <img ref="img_codeRef" :src="codeUrl" @click="getCode" />
+          </div>
+        </el-form-item>
+        <el-checkbox v-model="loginForm.RememberMe">记住密码</el-checkbox>
+        <el-form-item>
+          <el-button
+            size="medium"
+            type="primary"
+            round
+            style="width: 40%"
+            @click.native.prevent="handleLogin"
+          >
+            <span v-if="!loginLoading">登 录</span>
+            <span v-else>登 录 中...</span>
+          </el-button>
+          <el-button
+            size="medium"
+            type="primary"
+            round
+            style="width: 40%; margin-left: 70px"
+            @click="Register"
+          >
+            <span>注册</span>
+          </el-button>
         </el-form-item>
       </el-form>
-    </div>
+    </el-card>
   </div>
 </template>
 
 <script>
+import Cookies from "js-cookie";
 export default {
+  created() {
+    this.getCookie();
+  },
   name: "Login",
   data() {
     // 验证账号规则
@@ -51,12 +82,17 @@ export default {
       cb(new Error("请输入正确的13位学号"));
     };
     return {
+      codeUrl: process.env.VUE_APP_BASE_API + "/Login/CodeImg",
       loginForm: {
+        type: "",
         number: "",
         password: "",
+        RememberMe: false,
+        img_code: "",
       },
+      loginLoading: false,
       //   表单验证
-      loginFormRules: {
+      loginRules: {
         //   账号验证
         number: [
           { required: true, message: "请输入账号", trigger: "blur" },
@@ -67,82 +103,110 @@ export default {
           { required: true, message: "请输入密码", trigger: "blur" },
           { min: 6, max: 16, message: "长度在 3 到 5 个字符", trigger: "blur" },
         ],
+        img_code: [
+          { required: true, message: "验证码不能为空", trigger: "change" },
+        ],
       },
     };
   },
   methods: {
-    login() {
-      this.$refs.loginFormRef.validate(async (valid) => {
-        if (!valid) return;
-        const { data: res } = await this.$http.post("login", this.loginForm);
-        console.log(res.meta.status);
-        if (res.meta.status == 202) {
-          this.$message.error("用户不存在");
-        } else if (res.meta.status == 203) {
-          this.$message.error("密码错误");
-        } else if (res.meta.status == 200) {
-          this.$message.success("登录成功！");
-          window.sessionStorage.setItem("token", res.token);
-          window.sessionStorage.setItem("number", res.data[0].number);
-          window.sessionStorage.setItem("status", res.data[0].status);
-          this.$router.push("/Home");
-        }else{}
+    // 获取原有Cookies
+    getCookie() {
+      const number = Cookies.get("number");
+      const password = Cookies.get("password");
+      const RememberMe = Cookies.get("RememberMe");
+      const type = Cookies.get("type");
+      this.loginForm = {
+        number: number === undefined ? this.loginForm.number : number,
+        password: password === undefined ? this.loginForm.password : password,
+        RememberMe: RememberMe === undefined ? false : Boolean(RememberMe),
+        type: type === undefined ? this.loginForm.type : type,
+      };
+    },
+    handleLogin() {
+      this.$refs.loginForm.validate((valid) => {
+        if (valid) {
+          if (this.loginForm.RememberMe) {
+            Cookies.set("number", this.loginForm.number, { expires: 30 });
+            Cookies.set("password", this.loginForm.password, {
+              expires: 30,
+            });
+            Cookies.set("RememberMe", this.loginForm.RememberMe, {
+              expires: 30,
+            });
+            Cookies.set("type", this.loginForm.type, {
+              expires: 30,
+            });
+          } else {
+            Cookies.remove("number");
+            Cookies.remove("password");
+            Cookies.remove("RememberMe");
+            Cookies.remove("type");
+          }
+          this.$store
+            .dispatch("Login", this.loginForm)
+            .then((code) => {
+              switch (code) {
+                case 2000:
+                  alert("用户不存在");
+                  break;
+                case 2001:
+                  alert("登录成功");
+                  this.$router.push("/Home");
+                  break;
+                case 2002:
+                  alert("密码错误");
+                  break;
+                case 2003:
+                  alert("验证码不正确");
+                  break;
+                default:
+                  break;
+              }
+            })
+            .catch(() => {});
+        }
       });
     },
+    // 注册
     Register() {
+      window.sessionStorage.setItem("token", 123);
       this.$router.push("/Register");
+    },
+    // 获取验证码
+    getCode() {
+      this.codeUrl =
+        process.env.VUE_APP_BASE_API +
+        "/Login/CodeImg?t=" +
+        new Date().getTime();
     },
   },
 };
 </script>
 
 <style scoped>
-.login_container {
-  background-color: #2b4b6b;
-  height: 100%;
-}
-
-.login_box {
-  width: 450px;
-  height: 300px;
-  background-color: #fff;
-  border-radius: 3px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.avatar_box {
-  height: 130px;
-  width: 130px;
-  border: 1px solid #eee;
-  border-radius: 50%;
-  padding: 10px;
-  box-shadow: 0 0 10px #ddd;
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #fff;
-}
-
-img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: #eee;
-}
-
-.login_form {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  padding: 0 20px;
-  box-sizing: border-box;
-}
-
-.btns {
+.login {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url("../../assets/logo.png");
+}
+.title {
+  margin: 0px auto 30px auto;
+  text-align: center;
+  color: #707070;
+}
+button {
+  margin: 20px auto;
+}
+.login-code {
+  width: 33%;
+  height: 40px;
+  float: right;
+}
+img {
+  cursor: pointer;
+  vertical-align: middle;
 }
 </style>

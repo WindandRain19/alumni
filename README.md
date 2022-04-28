@@ -1,24 +1,10 @@
-# alumni
+# server
 
-## Project setup
-```
-npm install
-```
+## codeMean
 
-### Compiles and hot-reloads for development
 ```
-npm run serve
+2000:用户不存在
+2001:登录成功
+2002:密码错误
+2003:验证码不正确
 ```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

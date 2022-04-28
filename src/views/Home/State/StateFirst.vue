@@ -66,7 +66,7 @@ export default {
       },
       statesList: [],
       total: 0,
-      url: process.env.VUE_APP_UPLOAD_URL,
+      url: process.env.VUE_APP_UPLOAD_URL_STATE,
     };
   },
   methods: {
