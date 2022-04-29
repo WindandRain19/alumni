@@ -72,9 +72,9 @@
       :visible.sync="editDialogVisible2"
       width="70%"
     >
-        <el-form ref="editForm1" :model="editForm2" label-width="80px">
+        <el-form ref="editForm1" :model="picForm" label-width="80px">
           <el-form-item label="发布信息">
-            <el-input v-model="editForm2.article"></el-input>
+            <el-input v-model="picForm.article"></el-input>
           </el-form-item>
           <el-form-item label="图片">
             <el-upload
@@ -134,7 +134,7 @@
           </el-form-item>
         </el-form>
         <el-button @click="editDialogVisible2 = false">取 消</el-button>
-        <el-button type="primary" @click="submit1"
+        <el-button type="primary" @click="picSubmit"
           >确 定</el-button
         >
       </span>
@@ -143,6 +143,8 @@
 </template>
 
 <script>
+import { getForumFive,getForumInfo,postFontForum,postPicForum } from "../../../api/Forum"
+import Cookies from "js-cookie";
 export default {
   created(){
     this.getForum()
@@ -153,7 +155,7 @@ export default {
       editDialogVisible:false,
       editForm:{},
       editDialogVisible2:false,
-      editForm2:{},
+      picForm:{},
       actionUrl1:"http://127.0.0.1:5001/Home/ForumSecond/upload1",
       actionUrl2:"http://127.0.0.1:5001/Home/ForumSecond/upload2",
       actionUrl3:"http://127.0.0.1:5001/Home/ForumSecond/upload3",
@@ -172,21 +174,23 @@ export default {
     }
   },
   methods:{
-    async handleGive(give,time){
-      const {data : res } = await this.$http.post("/Home/ForumSecond/give",{
-        give,time
-      });
-      if (res.meta.status == 200) {
-        this.getForum()
-      }
+    handleGive(give,time){
+      getForumFive(give,time).then((data)=>{  
+        console.log("getForumFive",data);
+        if (data.data.status == 2001) {
+          this.getForum()
+        }
+      })
     },
-    async getForum(){
-      const {data : res } = await this.$http.get("/Home/ForumSecond")
-      if (res.meta.status!==200) {
-        this.$message.error('数据获取失败')
-      }else{
-        this.data=res.data
-      }
+    getForum(){
+      getForumInfo().then((data)=>{
+        console.log("getForumInfo",data);
+        if (data.data.status!==2001) {
+          this.$message.error('数据获取失败')
+        }else{
+          this.data=data.data.result
+        }
+      })
     },
     showEditDialog(){
       this.editDialogVisible=true
@@ -199,41 +203,38 @@ export default {
         this.$message.warning('每次选图最多为1');
       }
     },
-    async fontSubmit(){
-      let number = window.sessionStorage.getItem('number')
-      console.log(number);
-     const { data: res } = await this.$http.post("/Home/ForumSecond", {
-        data: this.editForm,
-        number
-      });
-      if (res.meta.status!==200) {
-        this.$message.error('文字发布失败')
-      }else{
-        this.$message.success('文字发布失败成功')
-        this.editDialogVisible = false
-        this.getForum()
-      }
-      
+    // 文字发布
+    fontSubmit(){
+      let number = Cookies.get('number')
+      postFontForum(this.editForm,number).then((data)=>{
+        console.log("postFontForum",data);
+        if (data.data.status!==2001) {
+          this.$message.error('文字发布失败')
+        }else{
+          this.$message.success('文字发布失败成功')
+          this.editDialogVisible = false
+          this.getForum()
+        }
+      })
     },
-    async submit1(){
-      let number = window.sessionStorage.getItem('number')
-      const { data: res } = await this.$http.post("/Home/ForumSecond/up", {
-        data: this.editForm2,
-        number
-      });
-      if (res.meta.status!==200) {
-        this.$message.error('图片发布失败')
-      }else{
-        this.$refs.pic1Upload.submit()
-        this.$refs.pic2Upload.submit()
-        this.$refs.pic3Upload.submit()
-        this.$refs.pic4Upload.submit()
-        this.$message.success('图片发布成功')
-        this.editDialogVisible2=false
-        this.getForum()
-      }
+    // 图片发布
+    picSubmit(){
+      let number = Cookies.get('number')
+      postPicForum(this.picForm,number).then((data)=>{
+        console.log("postFontForum",data);
+        if (data.data.status!==200) {
+          this.$message.error('图片发布失败')
+        }else{
+          this.$refs.pic1Upload.submit()
+          this.$refs.pic2Upload.submit()
+          this.$refs.pic3Upload.submit()
+          this.$refs.pic4Upload.submit()
+          this.$message.success('图片发布成功')
+          this.editDialogVisible2=false
+          this.getForum()
+        }
+      })
     }
-
   }
 };
 </script>

@@ -11,21 +11,24 @@
       <!--申请表格 -->
       <el-form
         ref="formRef"
-        :model="form"
-        :rules="formRules"
+        :model="requestForm"
+        :rules="requestFormRules"
         label-width="80px"
       >
         <el-form-item label="活动名称" prop="name" required>
-          <el-input v-model="form.name" style="width: 40%"></el-input>
+          <el-input v-model="requestForm.name" style="width: 40%"></el-input>
         </el-form-item>
         <el-form-item label="负责人" prop="user" required>
-          <el-input v-model="form.user" style="width: 40%"></el-input>
+          <el-input v-model="requestForm.user" style="width: 40%"></el-input>
         </el-form-item>
         <el-form-item label="电话" prop="telephone" required>
-          <el-input v-model="form.telephone" style="width: 40%"></el-input>
+          <el-input
+            v-model="requestForm.telephone"
+            style="width: 40%"
+          ></el-input>
         </el-form-item>
         <el-form-item label="活动区域" prop="region" required>
-          <el-select v-model="form.region" placeholder="请选择活动区域">
+          <el-select v-model="requestForm.region" placeholder="请选择活动区域">
             <el-option label="旧校区" value="旧校区"></el-option>
             <el-option label="新校区" value="新校区"></el-option>
           </el-select>
@@ -36,7 +39,7 @@
               <el-date-picker
                 type="date"
                 placeholder="选择日期"
-                v-model="form.date1"
+                v-model="requestForm.date1"
                 value-format="yyyy-MM-dd"
                 style="width: 90%"
               ></el-date-picker>
@@ -47,7 +50,7 @@
             <el-form-item prop="date2">
               <el-time-picker
                 placeholder="选择时间"
-                v-model="form.date2"
+                v-model="requestForm.date2"
                 value-format="HH:mm:ss"
                 style="width: 90%"
               ></el-time-picker>
@@ -55,7 +58,7 @@
           </el-col>
         </el-form-item>
         <el-form-item label="活动性质" prop="type" required>
-          <el-radio-group v-model="form.type">
+          <el-radio-group v-model="requestForm.type">
             <el-radio label="申请入校"></el-radio>
             <el-radio label="线上活动"></el-radio>
             <el-radio label="线下活动"></el-radio>
@@ -64,7 +67,7 @@
         <el-form-item label="活动简介" prop="introduction" required>
           <el-input
             type="textarea"
-            v-model="form.introduction"
+            v-model="requestForm.introduction"
             style="width: 40%"
           ></el-input>
         </el-form-item>
@@ -77,11 +80,13 @@
 </template>
 
 <script>
+import Cookies from "js-cookie";
+import { postRequest } from "../../../api/Request";
 export default {
   name: "RequestFirst",
   data() {
     return {
-      form: {
+      requestForm: {
         name: "",
         user: "",
         telephone: "",
@@ -91,7 +96,7 @@ export default {
         type: "",
         introduction: "",
       },
-      formRules: {
+      requestFormRules: {
         name: [{ required: true, message: "请输入活动名称", trigger: "blur" }],
         user: [{ required: true, message: "请输入负责人", trigger: "blur" }],
         telephone: [
@@ -112,26 +117,21 @@ export default {
   methods: {
     async onSubmit() {
       // 提示框
-      const confirmResult = await this.$confirm(
-        "是否确认提交?",
-        "提示",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-        }
-      ).catch((err) => err);
-       let number = window.sessionStorage.getItem("number");
+      const confirmResult = await this.$confirm("是否确认提交?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).catch((err) => err);
+      const number = Cookies.get("number");
+      const requestForm = this.requestForm;
       if (confirmResult == "confirm") {
-        const { data: res } = await this.$http.post(
-          "/Home/requestFirst",
-          {form:this.form,number}
-        );
-        if (res.meta.status !== 200) {
-          return this.$message.error("提交失败");
-        }
-        this.$message.success("提交成功");
-        this.$refs.formRef.resetFields();
+        postRequest(requestForm, number).then((data) => {
+          if (data.data.status !== 2001) {
+            return this.$message.error(data.data.msg);
+          }
+          this.$message.success(data.data.msg);
+          this.$refs.formRef.resetFields();
+        });
       }
     },
   },

@@ -21,7 +21,11 @@
             />
           </template>
         </el-table-column>
-        <el-table-column label="姓名" width="120px" prop="name"></el-table-column>
+        <el-table-column
+          label="姓名"
+          width="120px"
+          prop="name"
+        ></el-table-column>
         <el-table-column label="简介" prop="info"> </el-table-column>
         <el-table-column label="操作" width="120px">
           <template slot-scope="scope">
@@ -54,12 +58,11 @@
       >
       </el-pagination>
     </el-card>
-
-    
   </div>
 </template>
 
 <script>
+import { getShowInfo } from "../../../api/Show";
 export default {
   created() {
     this.getShowList();
@@ -79,20 +82,16 @@ export default {
       total: 0,
       imgUrl: process.env.VUE_APP_UPLOAD_URL_SHOW_PICTURES,
       pdfUrl: process.env.VUE_APP_UPLOAD_URL_SHOW_DOCUMENT,
-
-
     };
   },
   methods: {
-    async getShowList() {
-      const { data: res } = await this.$http.get("/Home/showFirst", {
-        params: this.queryInfo,
+    getShowList() {
+      getShowInfo(this.queryInfo).then((data) => {
+        if (data.data.status !== 2001)
+          return this.$message.error("用户列表获取失败");
+        this.showUsersList = data.data.result;
+        this.total = data.data.total;
       });
-      if (res.meta.status !== 200)
-        return this.$message.error("用户列表获取失败");
-      this.showUsersList = res.data;
-      console.log(this.showUsersList);
-      this.total = res.total;
     },
     handleSizeChange(newSize) {
       this.queryInfo.pageSize = newSize;

@@ -117,6 +117,12 @@
 </template>
 
 <script>
+import {
+  getStateInfo,
+  getPersonStateInfo,
+  updateStateInfo,
+  deleteStateInfo,
+} from "../../../api/State";
 export default {
   created() {
     this.getStateList();
@@ -182,13 +188,12 @@ export default {
     // 表格
     // 监听的pageSize
     async getStateList() {
-      const { data: res } = await this.$http.get("/Home/stateSecond", {
-        params: this.queryInfo,
+      getStateInfo(this.queryInfo).then((data) => {
+        const { status, result, total } = data.data;
+        if (status !== 2001) return this.$message.error("动态列表获取失败");
+        this.statesList = result;
+        this.total = total;
       });
-      if (res.meta.status !== 200)
-        return this.$message.error("动态列表获取失败");
-      this.statesList = res.data;
-      this.total = res.total;
     },
     handleSizeChange(newSize) {
       this.queryInfo.pageSize = newSize;
@@ -206,25 +211,24 @@ export default {
     // 展示修改用户信息
     async showEditDialog(id) {
       this.editDialogVisible = true;
-      const { data: res } = await this.$http.get("/Home/stateSecond/" + id);
-      if (!res.meta.status == 200)
-        return this.$message.error("查询用户信息失败");
-      this.editForm = res.data[0];
+      getPersonStateInfo(id).then((data) => {
+        const { status, result } = data.data;
+        if (status !== 2001) return this.$message.error("查询用户信息失败");
+        this.editForm = result[0];
+      });
     },
     // 修改用户信息并提交
     editUserInfo() {
       this.$refs.editFormRef.validate(async (valid) => {
         if (!valid) return;
         // 发起添加用户的网络请求
-        const { data: res } = await this.$http.put(
-          "/Home/stateSecond/" + this.editForm.id,
-          {
-            pdfName: this.editForm.pdfName,
+        updateStateInfo(this.editForm.id, this.editForm.pdfName).then(
+          (data) => {
+            const { status } = data.data;
+            if (status !== 2001) return this.$message.error("修改用户信息失败");
+            this.$message.success("修改用户信息成功");
           }
         );
-        if (res.meta.status !== 200)
-          return this.$message.error("修改用户信息失败");
-        this.$message.success("修改用户信息成功");
       });
       this.editDialogVisible = false;
       this.getStateList();
@@ -244,11 +248,12 @@ export default {
       if (confirmResult !== "confirm") {
         return this.$message.info("已经取消删除");
       }
-      const { data: res } = await this.$http.delete("/Home/stateSecond/" + id);
-      console.log(res);
-      if (res.meta.status !== 200) return this.$message.error("删除用户失败");
-      this.$message.success("删除用户成功");
-      this.getStateList();
+      deleteStateInfo(id).then((data) => {
+        const { status } = data.data;
+        if (status !== 2001) return this.$message.error("删除用户失败");
+        this.$message.success("删除用户成功");
+        this.getStateList();
+      });
     },
   },
 };

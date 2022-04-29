@@ -5,10 +5,8 @@
       <el-form ref="loginForm" :model="loginForm" :rules="loginRules">
         <el-form-item label="用户类型">
           <el-select v-model="loginForm.type" placeholder="用户类型">
+            <el-option label="普通用户" value="普通用户"></el-option>
             <el-option label="超级管理员" value="超级管理员"></el-option>
-            <el-option label="校友办职员" value="校友办职员"></el-option>
-            <el-option label="学生" value="学生"></el-option>
-            <el-option label="教师" value="教师"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="账号:" style="width: 500px" prop="number">

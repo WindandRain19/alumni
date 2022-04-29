@@ -152,6 +152,13 @@
 </template>
 
 <script>
+import {
+  getShowInfo,
+  postShowInfo,
+  getPersonShowInfo,
+  UpdateShowInfo,
+  deleteShowInfo,
+} from "../../../api/Show";
 export default {
   created() {
     this.getShowList();
@@ -215,27 +222,24 @@ export default {
       }
       return isJPG && isLt2M;
     },
-    async formSubmit() {
-      const { data: res } = await this.$http.post(
-        "/Home/showSecond",
-        this.showForm
-      );
-      if (res.meta.status == 200) {
-        this.$refs.picUpload.submit();
-        this.$refs.pdfUpload.submit();
-      } else {
-        this.$message.error("上传失败");
-      }
+    formSubmit() {
+      postShowInfo(this.showForm).then((data) => {
+        const { status } = data.data;
+        if (status == 2001) {
+          this.$refs.picUpload.submit();
+          this.$refs.pdfUpload.submit();
+        } else {
+          this.$message.error("上传失败");
+        }
+      });
     },
     async getShowList() {
-      const { data: res } = await this.$http.get("/Home/showFirst", {
-        params: this.queryInfo,
+      getShowInfo(this.queryInfo).then((data) => {
+        const { status, result, total } = data.data;
+        if (status !== 2001) return this.$message.error("用户列表获取失败");
+        this.showUsersList = result;
+        this.total = total;
       });
-      if (res.meta.status !== 200)
-        return this.$message.error("用户列表获取失败");
-      this.showUsersList = res.data;
-      console.log(this.showUsersList);
-      this.total = res.total;
     },
     handleSizeChange(newSize) {
       this.queryInfo.pageSize = newSize;
@@ -251,28 +255,24 @@ export default {
       this.$refs.editFormRef.resetFields();
     },
     // 展示修改用户信息
-    async showEditDialog(id) {
+    showEditDialog(id) {
       this.editDialogVisible = true;
-      const { data: res } = await this.$http.get("/Home/showSecond/" + id);
-      if (!res.meta.status == 200)
-        return this.$message.error("查询用户信息失败");
-      this.editForm = res.data[0];
+      getPersonShowInfo(id).then((data) => {
+        const { status, result } = data.data;
+        if (status !== 2001) return this.$message.error("查询用户信息失败");
+        this.editForm = result[0];
+      });
     },
     // 修改用户信息并提交
     editShowInfo() {
       this.$refs.editFormRef.validate(async (valid) => {
         if (!valid) return;
         // 发起添加用户的网络请求
-        const { data: res } = await this.$http.put(
-          "/Home/showSecond/" + this.editForm.id,
-          {
-            name: this.editForm.name,
-            info: this.editForm.info,
-          }
-        );
-        if (res.meta.status !== 200)
-          return this.$message.error("修改用户信息失败");
-        this.$message.success("修改用户信息成功");
+        UpdateShowInfo(this.editForm.id, this.editForm).then((data) => {
+          const { status } = data.data;
+          if (status !== 2001) return this.$message.error("修改用户信息失败");
+          this.$message.success("修改用户信息成功");
+        });
       });
       this.editDialogVisible = false;
       this.getShowList();
@@ -292,11 +292,12 @@ export default {
       if (confirmResult !== "confirm") {
         return this.$message.info("已经取消删除");
       }
-      const { data: res } = await this.$http.delete("/Home/showSecond/" + id);
-      console.log(res);
-      if (res.meta.status !== 200) return this.$message.error("删除用户失败");
-      this.$message.success("删除用户成功");
-      this.getShowList();
+      deleteShowInfo(id).then((data) => {
+        const { status } = data.data;
+        if (status !== 2001) return this.$message.error("删除用户失败");
+        this.$message.success("删除用户成功");
+        this.getShowList();
+      });
     },
   },
 };

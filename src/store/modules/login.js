@@ -17,9 +17,9 @@ const login = {
     Login({ commit }, userInfo) {
       const number = userInfo.number;
       const password = userInfo.password;
-      const img_code = userInfo.img_code
+      const img_code = userInfo.img_code;
       return new Promise((resolve, reject) => {
-        Login(number, password,img_code)
+        Login(number, password, img_code)
           .then((res) => {
             res = res.data;
             setToken(res.token);

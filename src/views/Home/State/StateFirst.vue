@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import { getStateInfo } from "../../../api/State";
 export default {
   created() {
     this.getStateList();
@@ -72,14 +73,14 @@ export default {
   methods: {
     // 表格
     // 监听的pageSize
-    async getStateList() {
-      const { data: res } = await this.$http.get("/Home/stateSecond", {
-        params: this.queryInfo,
+    getStateList() {
+      getStateInfo(this.queryInfo).then((data) => {
+        console.log(data);
+        if (data.data.status !== 2001)
+          return this.$message.error("动态列表获取失败");
+        this.statesList = data.data.result;
+        this.total = data.data.total;
       });
-      if (res.meta.status !== 200)
-        return this.$message.error("动态列表获取失败");
-      this.statesList = res.data;
-      this.total = res.total;
     },
     handleSizeChange(newSize) {
       this.queryInfo.pageSize = newSize;

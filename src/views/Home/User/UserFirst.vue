@@ -178,7 +178,7 @@
           <el-input v-model="changeForm.name" disabled></el-input>
         </el-form-item>
         <el-form-item label="角色分配">
-          <el-select v-model="changeForm.status" placeholder="普通用户">
+          <el-select v-model="changeForm.type" placeholder="普通用户">
             <el-option label="普通用户" value="普通用户"></el-option>
             <el-option label="管理员" value="管理员"></el-option>
           </el-select>
@@ -193,6 +193,15 @@
 </template>
 
 <script>
+import {
+  getUserInfo,
+  getUserInfos,
+  postUserInfo,
+  UpdateUserInfo,
+  deleteUserInfo,
+  updateUserRole,
+} from "../../../api/Users";
+import Cookies from "js-cookie";
 export default {
   created() {
     this.getUserList();
@@ -258,24 +267,20 @@ export default {
   },
   methods: {
     async getUserList() {
-      const { data: res } = await this.$http.get("/Home/userFirst", {
-        params: this.queryInfo,
+      getUserInfos(this.queryInfo).then((data) => {
+        let { status, result, total } = data.data;
+        if (status !== 2001) return this.$message.error("用户列表获取失败");
+        this.usersList = result;
+        this.total = total;
       });
-      if (res.meta.status !== 200)
-        return this.$message.error("用户列表获取失败");
-      this.usersList = res.data;
-      this.total = res.total;
     },
     // 监听的pageSize
     handleSizeChange(newSize) {
-      console.log(newSize);
       this.queryInfo.pageSize = newSize;
       this.getUserList();
-      console.log(this.queryInfo.pageSize);
     },
     // 监听pageNum
     handleCurrentChange(newPage) {
-      console.log(newPage);
       this.queryInfo.pageNum = newPage;
       this.getUserList();
     },
@@ -284,17 +289,16 @@ export default {
     },
     // 点击按钮添加用户
     addUser() {
-      this.$refs.addFormRef.validate(async (valid) => {
+      this.$refs.addFormRef.validate((valid) => {
         if (!valid) return;
         // 发起添加用户的网络请求
-        const { data: res } = await this.$http.post(
-          "/Home/userFirst",
-          this.addForm
-        );
-        if (res.meta.status !== 201) return this.$message.error("添加用户失败");
-        this.$message.success("添加用户成功");
-        this.addDialogVisible = false;
-        this.getUserList();
+        postUserInfo(this.addForm).then((data) => {
+          const { status } = data.data;
+          if (status !== 201) return this.$message.error("添加用户失败");
+          this.$message.success("添加用户成功");
+          this.addDialogVisible = false;
+          this.getUserList();
+        });
       });
     },
     // 监听修改对话框的关闭事件
@@ -304,33 +308,25 @@ export default {
     // 展示修改用户信息
     async showEditDialog(number) {
       this.editDialogVisible = true;
-      const { data: res } = await this.$http.get("/Home/userFirst/" + number);
-      if (!res.meta.status == 200)
-        return this.$message.error("查询用户信息失败");
-      this.editForm = res.data[0];
+      getUserInfo(number).then((data) => {
+        const { status } = data.data;
+        if (!status == 2001) return this.$message.error("查询用户信息失败");
+        this.editForm = res.data[0];
+      });
     },
     // 修改用户信息并提交
     editUserInfo() {
-      this.$refs.editFormRef.validate(async (valid) => {
+      this.$refs.editFormRef.validate((valid) => {
         if (!valid) return;
-        // 发起添加用户的网络请求
-        const { data: res } = await this.$http.put(
-          "/Home/userFirst/" + this.editForm.number,
-          {
-            number: this.editForm.number,
-            name: this.editForm.name,
-            college: this.editForm.college,
-            class: this.editForm.class,
-            telephone: this.editForm.telephone,
-            title: this.editForm.title,
-          }
-        );
-        if (res.meta.status !== 200)
-          return this.$message.error("修改用户信息失败");
-        this.$message.success("修改用户信息成功");
+        // 发起更新用户的网络请求
+        UpdateUserInfo(this.editForm.number, this.editForm).then((data) => {
+          const { status } = data.data;
+          if (status !== 2001) return this.$message.error("修改用户信息失败");
+          this.$message.success("修改用户信息成功");
+          this.editDialogVisible = false;
+          this.getUserList();
+        });
       });
-      this.editDialogVisible = false;
-      this.getUserList();
     },
     // 删除用户
     async removeUserByNumber(number) {
@@ -347,32 +343,36 @@ export default {
       if (confirmResult !== "confirm") {
         return this.$message.info("已经取消删除");
       }
-      const { data: res } = await this.$http.delete(
-        "/Home/userFirst/" + number
-      );
-      if (res.meta.status !== 200) return this.$message.error("删除用户失败");
-      this.$message.success("删除用户成功");
-      this.getUserList();
+      deleteUserInfo(number).then((data) => {
+        const { status } = data.data;
+        if (status !== 2001) return this.$message.error("删除用户失败");
+        this.$message.success("删除用户成功");
+        this.getUserList();
+      });
     },
-    async changeUserByNumber(number) {
+    changeUserByNumber(number) {
       this.changeDialogVisible = true;
-      const { data: res } = await this.$http.get("/Home/userFirst/" + number);
-      if (res.meta.status !== 200) return this.$message.error("用户查询失败");
-      this.$message.success("用户查询成功");
-      this.changeForm = res.data[0];
+      getUserInfo(number).then((data) => {
+        const { status, result } = data.data;
+        if (status !== 2001) return this.$message.error("用户查询失败");
+        this.$message.success("用户查询成功");
+        this.changeForm = result[0];
+      });
     },
     async handleChange() {
-      console.log(this.changeForm.number,this.changeForm.status);
-      const { data: res } = await this.$http.put(
-        "/Home/userFirst/up" ,{
-          number:this.changeForm.number,
-          status:this.changeForm.status
+      updateUserRole(this.changeForm.number, this.changeForm.type).then(
+        (data) => {
+          const { status } = data.data;
+          if (status !== 2001) return this.$message.error("用户权限修改失败");
+          this.$message.success("用户权限修改成功");
+          Cookies.setItem("type", this.changeForm.type);
+          this.changeDialogVisible = false;
         }
       );
-      if (res.meta.status !== 200) return this.$message.error("用户权限修改失败");
-      this.$message.success("用户权限修改成功");
-      window.sessionStorage.setItem('status',this.changeForm.status)
-      this.changeDialogVisible = false;
+      const { data: res } = await this.$http.put("/Home/userFirst/up", {
+        number: this.changeForm.number,
+        status: this.changeForm.status,
+      });
     },
   },
 };

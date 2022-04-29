@@ -56,7 +56,7 @@
                 type="primary"
                 icon="el-icon-edit"
                 size="mini"
-                @click="showEditDialog(scope.row.user)"
+                @click="showEditDialog(scope.row.number)"
               ></el-button>
             </el-tooltip>
             <el-tooltip
@@ -69,7 +69,7 @@
                 type="danger"
                 icon="el-icon-delete"
                 size="mini"
-                @click="removeRequestByUser(scope.row.user)"
+                @click="removeRequestByUser(scope.row.idRequest)"
               ></el-button>
             </el-tooltip>
             <el-tooltip
@@ -82,7 +82,7 @@
                 type="info"
                 icon="el-icon-s-claim"
                 size="mini"
-                @click="changeRequestByUser(scope.row.idrequest)"
+                @click="changeRequestByUser(scope.row.idRequest)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -191,7 +191,7 @@
         :rules="changeFormRules"
         label-width="80px">
         <el-form-item label="id">
-          <el-input v-model="changeForm.idrequest" style="width: 40%" disabled></el-input>
+          <el-input v-model="changeForm.idRequest" style="width: 40%" disabled></el-input>
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="changeForm.status" placeholder="请选择活动区域">
@@ -210,6 +210,7 @@
 </template>
 
 <script>
+import {getRequestInfo,getPersonRequestInfo,updateRequest,deleteRequestInfo,getIdRequestInfo,updateRequestById} from "../../../api/Request"
 export default {
   created() {
     this.getRequestList();
@@ -260,7 +261,7 @@ export default {
       // 审批
       changeDialogVisible:false,
       changeForm:{
-        idrequest:"",
+        idRequest:"",
         status:""
       },
       changeFormRules:{},
@@ -269,13 +270,13 @@ export default {
   methods: {
     // 获取申请列表
     async getRequestList() {
-      const { data: res } = await this.$http.get("/Home/requestSecond", {
-        params: this.queryInfo,
-      });
-      if (res.meta.status !== 200)
-        return this.$message.error("用户列表获取失败");
-      this.requestList = res.data;
-      this.total = res.total;
+      getRequestInfo(this.queryInfo).then((data)=>{
+        const {status,result,total} =data.data
+        if (status !== 2001)
+          return this.$message.error("用户列表获取失败");
+        this.requestList = result;
+        this.total = total;
+      })
     },
     // 监听的pageSize
     handleSizeChange(newSize) {
@@ -292,41 +293,33 @@ export default {
       this.$refs.editFormRef.resetFields();
     },
     // 展示修改用户信息
-    async showEditDialog(user) {
+    showEditDialog(number) {
       this.editDialogVisible = true;
-      console.log(user);
-      const { data: res } = await this.$http.get("/Home/requestSecond/" + user);
-      if (!res.meta.status == 200)
+      getPersonRequestInfo(number).then((data)=>{
+        const{status,result} =data.data
+      if (status !== 2001)
         return this.$message.error("查询用户信息失败");
-      this.editForm = res.data[0];
+      this.editForm = result;
+      })
     },
     // 修改用户信息并提交
     editRequestInfo() {
-      this.$refs.editFormRef.validate(async (valid) => {
+      this.$refs.editFormRef.validate((valid) => {
         if (!valid) return;
         // 发起添加用户的网络请求
-        const { data: res } = await this.$http.put(
-          "/Home/requestSecond/" + this.editForm.user,
-          {
-            name: this.editForm.name,
-            user: this.editForm.user,
-            telephone: this.editForm.telephone,
-            region: this.editForm.region,
-            date1: this.editForm.date1,
-            date2: this.editForm.date2,
-            type: this.editForm.type,
-            introduction: this.editForm.introduction,
-          }
-        );
-        if (res.meta.status !== 200)
+        updateRequest(this.editForm,this.editForm.number).then((data)=>{
+          const {status} =data.data
+          if (status !== 2001)
           return this.$message.error("修改用户信息失败");
-        this.$message.success("修改用户信息成功");
-      });
-      this.editDialogVisible = false;
-      this.getRequestList();
+          this.$message.success("修改用户信息成功");
+        });
+        this.editDialogVisible = false;
+        this.getRequestList();
+      })
+
     },
     // 删除用户
-    async removeRequestByUser(user) {
+    async removeRequestByUser(idRequest) {
       // 弹框
       const confirmResult = await this.$confirm(
         "此操作将永久删除该用户, 是否继续?",
@@ -340,26 +333,30 @@ export default {
       if (confirmResult !== "confirm") {
         return this.$message.info("已经取消删除");
       }
-      const { data: res } = await this.$http.delete(
-        "/Home/requestSecond/" + user
-      );
-      if (res.meta.status !== 200) return this.$message.error("删除用户失败");
-      this.$message.success("删除用户成功");
-      this.getRequestList();
+      deleteRequestInfo(idRequest).then((data)=>{
+        const {status} =data.data
+        if (status !== 2001) return this.$message.error("删除用户失败");
+        this.$message.success("删除用户成功");
+        this.getRequestList();
+      })
     },
     // 审批
-    async changeRequestByUser(id) {
+    async changeRequestByUser(idRequest) {
       this.changeDialogVisible=true
-      const {data:res} = await this.$http.get("/Home/requestSecond/change/"+id)
-      if (res.meta.status !==200) return this.$message.error("获取用户失败")
-      this.changeForm=res.data[0]
+      getIdRequestInfo(idRequest).then((data)=>{
+        const {status,result} = data.data
+        if (status !==200) return this.$message.error("获取用户失败")
+        this.changeForm=result[0]
+      })
     },
     async changeHandle(){
-      const{data:res} = await this.$http.post("/Home/requestSecond/change",this.changeForm)
-      if (res.meta.status !==200) return this.$message.error("提交失败")
-      this.$message.success("审批成功")
-      this.changeDialogVisible=false
-      this.getRequestList();
+      updateRequestById(this.changeForm.idRequest,this.changeForm.status).then((data)=>{
+        const {status} = data.data
+        if (status !==2001) return this.$message.error("提交失败")
+        this.$message.success("审批成功")
+        this.changeDialogVisible=false
+        this.getRequestList();
+      })
     }
   },
 };

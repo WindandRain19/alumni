@@ -10,7 +10,7 @@
     <!-- 卡片区 -->
     <el-card class="box-card">
       <el-table :data="ForumList" style="width: 100%" max-height="800">
-        <el-table-column fixed label="#" type="index" width="150">
+        <el-table-column fixed label="#" type="index" width="100">
         </el-table-column>
         <el-table-column prop="time" label="时间" width="200">
         </el-table-column>
@@ -38,10 +38,10 @@
             <img :src="img4 + scope.row.pic4" alt="" style="width: 150px" />
           </template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" width="300">
+        <el-table-column fixed="right" label="操作" width="100">
           <template slot-scope="scope">
             <el-button
-              @click="handleRemove(scope.row.idforum)"
+              @click="handleRemove(scope.row.idForum)"
               type="danger"
               size="small"
             >
@@ -55,6 +55,7 @@
 </template>
 
 <script>
+import { getForumInfo, deleteForum } from "../../../api/Forum";
 export default {
   created() {
     this.getForum();
@@ -70,17 +71,18 @@ export default {
     };
   },
   methods: {
-    async getForum() {
-      const { data: res } = await this.$http.get("/Home/ForumSecond");
-      if (res.meta.status !== 200) {
-        this.$message.error("数据获取失败");
-      } else {
-        this.ForumList = res.data;
-        this.$message.success("数据获取成功");
-      }
+    getForum() {
+      getForumInfo().then((data) => {
+        if (data.data.status !== 2001) {
+          this.$message.error("数据获取失败");
+        } else {
+          this.ForumList = data.data.result;
+          this.$message.success("数据获取成功");
+        }
+      });
     },
-    async handleRemove(idforum) {
-      console.log(idforum);
+    // 删除留言
+    async handleRemove(idForum) {
       // 弹框
       const confirmResult = await this.$confirm(
         "此操作将永久删除该用户, 是否继续?",
@@ -94,12 +96,12 @@ export default {
       if (confirmResult !== "confirm") {
         return this.$message.info("已经取消删除");
       }
-      const { data: res } = await this.$http.delete(
-        "/Home/ForumSecond/" + idforum
-      );
-      if (res.meta.status !== 200) return this.$message.error("删除用户失败");
-      this.$message.success("删除用户成功");
-      this.getForum();
+      deleteForum(idForum).then((data) => {
+        if (data.data.status !== 200)
+          return this.$message.error("删除用户失败");
+        this.$message.success("删除用户成功");
+        this.getForum();
+      });
     },
   },
 };

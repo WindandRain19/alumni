@@ -9,7 +9,7 @@
 
     <div class="cardBox">
       <el-card class="card-left">
-        <el-form ref="registerRef" :model="updateForm" label-width="100px">
+        <el-form ref="infoFormRef" :model="infoForm" label-width="100px">
           <el-form-item label="头像">
             <el-upload
               class="avatar-uploader"
@@ -28,56 +28,56 @@
           </el-form-item>
           <el-form-item label="姓名">
             <el-input
-              v-model="updateForm.name"
+              v-model="infoForm.name"
               :disabled="disabled1"
               style="width: 30%"
             ></el-input>
           </el-form-item>
           <el-form-item label="学号">
             <el-input
-              v-model="updateForm.number"
+              v-model="infoForm.number"
               disabled
               style="width: 30%"
             ></el-input>
           </el-form-item>
           <el-form-item label="密码">
             <el-input
-              v-model="updateForm.password"
+              v-model="infoForm.password"
               :disabled="disabled1"
               style="width: 30%"
             ></el-input>
           </el-form-item>
           <el-form-item label="电话">
             <el-input
-              v-model="updateForm.telephone"
+              v-model="infoForm.telephone"
               style="width: 30%"
               :disabled="disabled1"
             ></el-input>
           </el-form-item>
           <el-form-item label="现住址">
             <el-input
-              v-model="updateForm.address"
+              v-model="infoForm.address"
               style="width: 30%"
               :disabled="disabled1"
             ></el-input>
           </el-form-item>
           <el-form-item label="职称">
             <el-input
-              v-model="updateForm.title"
+              v-model="infoForm.title"
               style="width: 30%"
               :disabled="disabled1"
             ></el-input>
           </el-form-item>
           <el-form-item label="公司名称">
             <el-input
-              v-model="updateForm.company"
+              v-model="infoForm.company"
               style="width: 50%"
               :disabled="disabled1"
             ></el-input>
           </el-form-item>
           <el-form-item label="公司地址">
             <el-input
-              v-model="updateForm.work_address"
+              v-model="infoForm.work_address"
               style="width: 50%"
               :disabled="disabled1"
             ></el-input>
@@ -88,7 +88,7 @@
                 :options="options"
                 :props="{ checkStrictly: true }"
                 clearable
-                v-model="updateForm.collegeClass"
+                v-model="infoForm.collegeClass"
                 :disabled="disabled1"
               ></el-cascader>
             </div>
@@ -98,7 +98,7 @@
               <el-date-picker
                 type="date"
                 placeholder="选择日期"
-                v-model="updateForm.time"
+                v-model="infoForm.time"
                 style="width: 100%"
                 :disabled="disabled1"
               ></el-date-picker>
@@ -137,6 +137,10 @@
 </template>
 
 <script>
+import { getOptions } from "../../../api/Opotions";
+import { getUserInfo, UpdateUserInfo } from "../../../api/Users";
+import { getPersonRequestInfo } from "../../../api/Request";
+import Cookies from "js-cookie";
 export default {
   created() {
     this.getUserInfo();
@@ -146,7 +150,7 @@ export default {
   name: "UserSecond",
   data() {
     return {
-      updateForm: {
+      infoForm: {
         name: "",
         number: "",
         password: "",
@@ -167,24 +171,28 @@ export default {
     };
   },
   methods: {
+    // 获得所有学院班级
     async getOptions() {
-      const { data: res } = await this.$http.get("/Options");
-      this.options = res.data;
+      getOptions().then((data) => {
+        this.options = data.data.data;
+      });
     },
     async getUserInfo() {
-      let number = window.sessionStorage.getItem("number");
-      const { data: res } = await this.$http.get("/Home/UserSecond/" + number);
-      if (res.meta.status !== 200) {
-        this.$message.error("获取信息失败");
-      } else {
-        this.updateForm = res.data[0];
-        this.updateForm.collegeClass = [];
-        this.updateForm.collegeClass.push(res.data[0].college);
-        this.updateForm.collegeClass.push(res.data[0].class);
-        this.imageUrl = process.env.VUE_APP_UPLOAD_URL_HEAD_PORTRAIT + res.data[0].photo;
-        console.log(this.imageUrl);
-        this.$message.success("获取信息成功");
-      }
+      let number = Cookies.get("number");
+      getUserInfo(number).then((data) => {
+        const { result } = data.data;
+        if (data.data.status != 2001) {
+          this.$message.error(data.data.msg);
+        } else {
+          this.infoForm = result[0];
+          this.infoForm.collegeClass = [];
+          this.infoForm.collegeClass.push(result[0].college);
+          this.infoForm.collegeClass.push(result[0].class);
+          this.imageUrl =
+            process.env.VUE_APP_UPLOAD_URL_HEAD_PORTRAIT + result[0].photo;
+          this.$message.success(data.data.msg);
+        }
+      });
     },
     change() {
       this.disabled1 = false;
@@ -195,27 +203,26 @@ export default {
       this.imageUrl = URL.createObjectURL(blob);
       this.dialogImageUrl = this.imageUrl;
     },
-    async onSubmit() {
-      const { data: res } = await this.$http.put(
-        "/Home/UserSecond/up/" + this.updateForm.number,
-        this.updateForm
-      );
-      if (res.meta.status !== 200) {
-        this.$message.error("修改失败");
-      } else {
-        this.$message.success("修改成功");
-        this.disabled1 = true;
-        this.$refs.upload.submit();
-      }
+    onSubmit() {
+      UpdateUserInfo(this.infoForm.number, this.infoForm).then((data) => {
+        if (data.data.status !== 2001) {
+          this.$message.error(data.data.msg);
+        } else {
+          this.$message.success(data.data.msg);
+          this.disabled1 = true;
+          this.$refs.upload.submit();
+        }
+      });
     },
-    async getRequestInfo() {
+    getRequestInfo() {
       let number = window.sessionStorage.getItem("number");
-      const { data: res } = await this.$http.get(
-        "/Home/requestSecond/user/" + number
-      );
-      if (res.meta.status !== 200) return this.$message.err("查询申请失败");
-      console.log(res.data);
-      this.tableData = res.data;
+      getPersonRequestInfo(number).then((data) => {
+        console.log(data);
+        if (data.data.status !== 2001) {
+          return this.$message.error(data.data.msg);
+        }
+        this.tableData = data.result;
+      });
     },
   },
 };

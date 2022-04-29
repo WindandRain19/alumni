@@ -29,6 +29,7 @@
             :index="item.id + ''"
             v-for="item in menuList"
             :key="item.id"
+            @click="saveNavState('/' + subItem.path)"
           >
             <template slot="title">
               <i :class="iconsObject[item.id]"></i>
@@ -56,10 +57,13 @@
 </template>
 
 <script>
+import Cookies from "js-cookie";
+import { getMenuList } from "../../api/Menu";
 export default {
   created() {
     this.getMenuList();
     this.activePath = window.sessionStorage.getItem("activePath");
+    this.keepStyle();
   },
   name: "Home",
   data() {
@@ -73,7 +77,7 @@ export default {
         104: "el-icon-loading",
         105: "el-icon-magic-stick",
       },
-      isCollapse: false,
+      isCollapse: "",
       // 被激活的链接地址
       activePath: "",
     };
@@ -85,23 +89,27 @@ export default {
       this.$router.push("./Login");
     },
     // 获取所有菜单
-    async getMenuList() {
-      let status = {status:window.sessionStorage.getItem('status')}
-      const { data: res } = await this.$http.get("menus",{
-        params:status
+    getMenuList() {
+      let type = Cookies.get("type");
+      getMenuList(type).then((data) => {
+        const res = data.data;
+        if (res.status !== 2001) return this.$message.error("获取菜单失败");
+        this.menuList = res.data;
       });
-      console.log(res);
-      if (res.status !== 200) return this.$message.error("获取菜单失败");
-      this.menuList = res.data;
     },
     // 侧边栏按钮条折叠
     toggleCollapse() {
       this.isCollapse = !this.isCollapse;
+      window.sessionStorage.setItem("isCollapse", this.isCollapse);
     },
     // 保存链接的激活状态
     saveNavState(activePath) {
       window.sessionStorage.setItem("activePath", activePath);
       this.activePath = activePath;
+    },
+    keepStyle() {
+      this.$store.commit("GET_ISCOLLAPSE");
+      this.isCollapse = this.$store.state.layout.isCollapse;
     },
   },
 };
