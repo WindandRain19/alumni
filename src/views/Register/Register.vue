@@ -136,7 +136,6 @@
             </th>
           </tr>
         </table>
-
         <el-form-item>
           <el-button type="primary" @click="onSubmit">立即创建</el-button>
         </el-form-item>
@@ -146,6 +145,8 @@
 </template>
 
 <script>
+import { getOptions } from "../../api/Options";
+import { postUserInfo } from "../../api/Users";
 export default {
   created() {
     this.getOptions();
@@ -177,7 +178,7 @@ export default {
     return {
       registerForm: {
         name: "",
-        sex: "男",
+        sex: "",
         number: "",
         password: "",
         telephone: "",
@@ -225,37 +226,35 @@ export default {
       },
       //   头像
       imageUrl: "",
-      actionUrl: "http://127.0.0.1:5001/Register/upload",
+      actionUrl: process.env.VUE_APP_BASE_API + "/users/uploadHeadPortrait",
       options: [],
     };
   },
   methods: {
-    async getOptions() {
-      const { data: res } = await this.$http.get("/Options");
-      this.options = res.data;
+    getOptions() {
+      getOptions().then((data) => {
+        this.options = data.data.data;
+      });
     },
     //   头像
-    handlePreview(res, file) {
-      var blob = new Blob([file.row]);
-      this.imageUrl = URL.createObjectURL(blob);
-      this.dialogImageUrl = this.imageUrl;
+    handlePreview(file, fileList) {
+      this.$message.success("选择图片成功");
     },
     onSubmit() {
       this.$refs.registerRef.validate(async (valid) => {
         if (!valid) return;
-        const { data: res } = await this.$http.post(
-          "/Register",
-          this.registerForm
-        );
-        if (res.meta.status == 202) {
-          this.$message.error("用户已存在");
-        } else if (res.meta.status == 201) {
-          this.$message.error("注册失败");
-        } else {
-          this.$message.success("注册成功");
-          this.$refs.upload.submit();
-          this.registerForm = {};
-        }
+        postUserInfo(this.registerForm).then((data) => {
+          const { status } = data.data;
+          if (status == 2004) {
+            this.$message.error("用户已存在");
+          } else if (status == 2002) {
+            this.$message.error("注册失败");
+          } else {
+            this.$message.success("注册成功");
+            this.$refs.upload.submit();
+            this.registerForm = {};
+          }
+        });
       });
     },
   },

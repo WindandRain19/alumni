@@ -1,6 +1,6 @@
 module.exports = {
   lintOnSave: false,
-  devServer:{
+  devServer: {
     port: 8088,
     proxy: {
       "/api": {
@@ -15,5 +15,4 @@ module.exports = {
       },
     },
   },
-  
 };

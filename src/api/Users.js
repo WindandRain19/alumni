@@ -31,7 +31,7 @@ export function postUserInfo(addForm) {
   return request({
     url: "/users",
     method: "post",
-    params: addForm,
+    data: addForm,
   });
 }
 

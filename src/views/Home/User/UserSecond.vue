@@ -137,7 +137,7 @@
 </template>
 
 <script>
-import { getOptions } from "../../../api/Opotions";
+import { getOptions } from "../../../api/Options";
 import { getUserInfo, UpdateUserInfo } from "../../../api/Users";
 import { getPersonRequestInfo } from "../../../api/Request";
 import Cookies from "js-cookie";

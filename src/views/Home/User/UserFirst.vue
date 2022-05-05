@@ -294,7 +294,7 @@ export default {
         // 发起添加用户的网络请求
         postUserInfo(this.addForm).then((data) => {
           const { status } = data.data;
-          if (status !== 201) return this.$message.error("添加用户失败");
+          if (status !== 2001) return this.$message.error("添加用户失败");
           this.$message.success("添加用户成功");
           this.addDialogVisible = false;
           this.getUserList();
@@ -309,9 +309,9 @@ export default {
     async showEditDialog(number) {
       this.editDialogVisible = true;
       getUserInfo(number).then((data) => {
-        const { status } = data.data;
+        const { status, result } = data.data;
         if (!status == 2001) return this.$message.error("查询用户信息失败");
-        this.editForm = res.data[0];
+        this.editForm = result[0];
       });
     },
     // 修改用户信息并提交
