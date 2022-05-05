@@ -13,7 +13,7 @@
       <el-row :gutter="20">
         <el-col :span="7">
           <el-input
-            placeholder="请输入内容"
+            placeholder="请输入姓名"
             v-model="queryInfo.query"
             clearable
             @clear="getRequestList"
@@ -269,7 +269,7 @@ export default {
   },
   methods: {
     // 获取申请列表
-    async getRequestList() {
+    getRequestList() {
       getRequestInfo(this.queryInfo).then((data)=>{
         const {status,result,total} =data.data
         if (status !== 2001)
@@ -296,10 +296,12 @@ export default {
     showEditDialog(number) {
       this.editDialogVisible = true;
       getPersonRequestInfo(number).then((data)=>{
+        
         const{status,result} =data.data
       if (status !== 2001)
         return this.$message.error("查询用户信息失败");
-      this.editForm = result;
+      this.editForm = result[0];
+      console.log(this.editForm);
       })
     },
     // 修改用户信息并提交
@@ -307,6 +309,7 @@ export default {
       this.$refs.editFormRef.validate((valid) => {
         if (!valid) return;
         // 发起添加用户的网络请求
+        console.log(this.editForm,this.editForm.number);
         updateRequest(this.editForm,this.editForm.number).then((data)=>{
           const {status} =data.data
           if (status !== 2001)
@@ -341,15 +344,15 @@ export default {
       })
     },
     // 审批
-    async changeRequestByUser(idRequest) {
+    changeRequestByUser(idRequest) {
       this.changeDialogVisible=true
       getIdRequestInfo(idRequest).then((data)=>{
         const {status,result} = data.data
-        if (status !==200) return this.$message.error("获取用户失败")
+        if (status !==2001) return this.$message.error("获取用户失败")
         this.changeForm=result[0]
       })
     },
-    async changeHandle(){
+    changeHandle(){
       updateRequestById(this.changeForm.idRequest,this.changeForm.status).then((data)=>{
         const {status} = data.data
         if (status !==2001) return this.$message.error("提交失败")

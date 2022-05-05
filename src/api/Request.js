@@ -11,7 +11,7 @@ export function getPersonRequestInfo(number) {
 // id查询
 export function getIdRequestInfo(idRequest) {
   return request({
-    url: "/request/" + idRequest,
+    url: "/request/id/" + idRequest,
     method: "get",
   });
 }
@@ -61,7 +61,7 @@ export function updateRequestById(idRequest, status) {
     status,
   };
   return request({
-    url: "/request/" + idRequest,
+    url: "/request/putId/" + idRequest,
     method: "put",
     data,
   });

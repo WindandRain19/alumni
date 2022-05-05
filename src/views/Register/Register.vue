@@ -241,7 +241,7 @@ export default {
       this.$message.success("选择图片成功");
     },
     onSubmit() {
-      this.$refs.registerRef.validate(async (valid) => {
+      this.$refs.registerRef.validate((valid) => {
         if (!valid) return;
         postUserInfo(this.registerForm).then((data) => {
           const { status } = data.data;

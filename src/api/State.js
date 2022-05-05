@@ -10,14 +10,14 @@ export function getStateInfo(queryInfo) {
 
 export function getPersonStateInfo(id) {
   return request({
-    url: "/state1" + id,
+    url: "/state1/" + id,
     method: "get",
   });
 }
 
 export function updateStateInfo(id, pdfName) {
   return request({
-    url: "/state1" + id,
+    url: "/state1/" + id,
     method: "put",
     data: {
       pdfName,
@@ -27,7 +27,7 @@ export function updateStateInfo(id, pdfName) {
 // 删除
 export function deleteStateInfo(id) {
   return request({
-    url: "/users/" + id,
+    url: "/state1/" + id,
     method: "delete",
   });
 }

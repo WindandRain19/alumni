@@ -13,7 +13,7 @@
       <el-row :gutter="20">
         <el-col :span="7">
           <el-input
-            placeholder="请输入内容"
+            placeholder="请输入姓名"
             v-model="queryInfo.query"
             clearable
             @clear="getUserList"
@@ -99,31 +99,136 @@
     <el-dialog
       title="添加用户"
       :visible.sync="addDialogVisible"
-      width="30%"
+      width="60%"
       @close="addDialogClosed"
     >
       <!-- 内容主题区 -->
       <el-form
+        ref="addFormRef"
         :model="addForm"
         :rules="addFormRules"
-        ref="addFormRef"
         label-width="100px"
       >
-        <el-form-item label="用户名" prop="name">
-          <el-input v-model="addForm.name"></el-input>
+        <el-form-item label="头像">
+          <el-upload
+            class="avatar-uploader"
+            ref="upload"
+            :action="actionUrl"
+            :show-file-list="false"
+            :limit="1"
+            :on-change="handlePreview"
+            accept=".jpg,.png"
+            :multiple="false"
+            :auto-upload="false"
+          >
+            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
         </el-form-item>
-        <el-form-item label="学院" prop="college">
-          <el-input v-model="addForm.college"></el-input>
-        </el-form-item>
-        <el-form-item label="班级" prop="class">
-          <el-input v-model="addForm.class"></el-input>
-        </el-form-item>
-        <el-form-item label="电话" prop="telephone">
-          <el-input v-model="addForm.telephone"></el-input>
-        </el-form-item>
-        <el-form-item label="工作职称" prop="title">
-          <el-input v-model="addForm.title"></el-input>
-        </el-form-item>
+        <table Width="100%">
+          <tr>
+            <th>
+              <el-form-item label="姓名" prop="name">
+                <el-input v-model="addForm.name" style="width: 90%"></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="性别" prop="sex">
+                <el-radio-group v-model="addForm.sex">
+                  <el-radio label="男"></el-radio>
+                  <el-radio label="女"></el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="学号" prop="number">
+                <el-input
+                  v-model="addForm.number"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="密码" prop="password">
+                <el-input
+                  v-model="addForm.password"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="电话" prop="telephone">
+                <el-input
+                  v-model="addForm.telephone"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="现住址" prop="address">
+                <el-input
+                  v-model="addForm.address"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="职称" prop="title">
+                <el-input v-model="addForm.title" style="width: 90%"></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="公司名称" prop="company">
+                <el-input
+                  v-model="addForm.company"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="公司地址" prop="work_address">
+                <el-input
+                  v-model="addForm.work_address"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="学院和班级" prop="collegeClass">
+                <div class="block">
+                  <el-cascader
+                    :options="options"
+                    :props="{ checkStrictly: true }"
+                    clearable
+                    v-model="addForm.collegeClass"
+                  ></el-cascader>
+                </div>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="毕业时间" prop="time">
+                <el-col :span="11">
+                  <el-date-picker
+                    type="date"
+                    placeholder="选择日期"
+                    v-model="addForm.time"
+                    style="width: 100%"
+                  ></el-date-picker>
+                </el-col>
+              </el-form-item>
+            </th>
+          </tr>
+        </table>
       </el-form>
       <!-- 底部区域 -->
       <span slot="footer" class="dialog-footer">
@@ -143,27 +248,133 @@
       <el-form
         ref="editFormRef"
         :model="editForm"
-        :rules="editFormRules"
+        :rules="addFormRules"
         label-width="100px"
       >
-        <el-form-item label="账号" prop="number">
-          <el-input v-model="editForm.number" disabled></el-input>
+        <el-form-item label="头像">
+          <el-upload
+            class="avatar-uploader"
+            ref="upload1"
+            :action="actionUrl"
+            :show-file-list="false"
+            :limit="1"
+            :on-change="handlePreview"
+            accept=".jpg,.png"
+            :multiple="false"
+            :auto-upload="false"
+          >
+            <img v-if="imageUrl1" :src="imageUrl1" class="avatar" />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
         </el-form-item>
-        <el-form-item label="用户名" prop="name">
-          <el-input v-model="editForm.name"></el-input>
-        </el-form-item>
-        <el-form-item label="学院" prop="college">
-          <el-input v-model="editForm.college"></el-input>
-        </el-form-item>
-        <el-form-item label="班级" prop="class">
-          <el-input v-model="editForm.class"></el-input>
-        </el-form-item>
-        <el-form-item label="电话" prop="telephone">
-          <el-input v-model="editForm.telephone"></el-input>
-        </el-form-item>
-        <el-form-item label="工作职称" prop="title">
-          <el-input v-model="editForm.title"></el-input>
-        </el-form-item>
+        <table Width="100%">
+          <tr>
+            <th>
+              <el-form-item label="姓名" prop="name">
+                <el-input v-model="editForm.name" style="width: 90%"></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="性别" prop="sex">
+                <el-radio-group v-model="editForm.sex">
+                  <el-radio label="男"></el-radio>
+                  <el-radio label="女"></el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="学号" prop="number" >
+                <el-input
+                  v-model="editForm.number"
+                  style="width: 90%"
+                  disabled
+                ></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="密码" prop="password">
+                <el-input
+                  v-model="editForm.password"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="电话" prop="telephone">
+                <el-input
+                  v-model="editForm.telephone"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="现住址" prop="address">
+                <el-input
+                  v-model="editForm.address"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="职称" prop="title">
+                <el-input
+                  v-model="editForm.title"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="公司名称" prop="company">
+                <el-input
+                  v-model="editForm.company"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="公司地址" prop="work_address">
+                <el-input
+                  v-model="editForm.work_address"
+                  style="width: 90%"
+                ></el-input>
+              </el-form-item>
+            </th>
+            <th>
+              <el-form-item label="学院和班级" prop="collegeClass">
+                <div class="block">
+                  <el-cascader
+                    :options="options"
+                    :props="{ checkStrictly: true }"
+                    clearable
+                    v-model="editForm.collegeClass"
+                  ></el-cascader>
+                </div>
+              </el-form-item>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <el-form-item label="毕业时间" prop="time">
+                <el-col :span="11">
+                  <el-date-picker
+                    type="date"
+                    placeholder="选择日期"
+                    v-model="editForm.time"
+                    style="width: 100%"
+                  ></el-date-picker>
+                </el-col>
+              </el-form-item>
+            </th>
+          </tr>
+        </table>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editDialogVisible = false">取 消</el-button>
@@ -178,9 +389,9 @@
           <el-input v-model="changeForm.name" disabled></el-input>
         </el-form-item>
         <el-form-item label="角色分配">
-          <el-select v-model="changeForm.type" placeholder="普通用户">
+          <el-select v-model="changeForm.type">
             <el-option label="普通用户" value="普通用户"></el-option>
-            <el-option label="管理员" value="管理员"></el-option>
+            <el-option label="超级管理员" value="超级管理员"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -201,13 +412,37 @@ import {
   deleteUserInfo,
   updateUserRole,
 } from "../../../api/Users";
+import { getOptions } from "../../../api/Options";
 import Cookies from "js-cookie";
 export default {
   created() {
     this.getUserList();
+    this.getOptions();
   },
   name: "UserFirst",
   data() {
+    var checkName = (rule, value, cb) => {
+      const regName = /^[\u4e00-\u9fa5]{2,6}$/;
+      if (regName.test(value)) {
+        return cb();
+      }
+      cb(new Error("请输入2~6位中文"));
+    };
+    var checkNumber = (rule, value, cb) => {
+      const regNumber = /^\d{13}$/;
+      if (regNumber.test(value)) {
+        return cb();
+      }
+      cb(new Error("请输入正确的13位学号"));
+    };
+    var checkTelephone = (rule, value, cb) => {
+      const regTelephone =
+        /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
+      if (regTelephone.test(value)) {
+        return cb();
+      }
+      cb(new Error("请输入正确的电话号码"));
+    };
     return {
       // 获取用户列表
       queryInfo: {
@@ -224,41 +459,71 @@ export default {
       // 添加用户的表单数据
       addForm: {
         name: "",
-        college: "",
-        class: "",
+        sex: "",
+        number: "",
+        password: "",
         telephone: "",
+        address: "",
         title: "",
+        company: "",
+        work_address: "",
+        collegeClass: [],
+        time: "",
       },
       // 添加用户表单验证规则
       addFormRules: {
         name: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 2, max: 4, message: "用户名长度在2~4之间", trigger: "blur" },
+          { required: true, message: "请输入姓名", trigger: "blur" },
+          { validator: checkName, trigger: "blur" },
         ],
-        college: [{ required: true, message: "请输入学院", trigger: "blur" }],
-        class: [{ required: true, message: "请输入班级", trigger: "blur" }],
-        telephone: [{ required: true, message: "请输入电话", trigger: "blur" }],
-        title: [{ required: true, message: "请输入工作职称", trigger: "blur" }],
+        sex: [{ required: true, message: "请输入账号", trigger: "blur" }],
+        number: [
+          { required: true, message: "请输入账号", trigger: "blur" },
+          { validator: checkNumber, trigger: "blur" },
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          { min: 6, max: 16, message: "长度在6 到 16 个字符", trigger: "blur" },
+        ],
+        telephone: [
+          { required: true, message: "请输入电话", trigger: "blur" },
+          { validator: checkTelephone, trigger: "blur" },
+        ],
+        address: [{ required: true, message: "请输入地址", trigger: "blur" }],
+        title: [
+          { required: true, message: "请输入职称", trigger: "blur" },
+          { min: 2, max: 16, message: "长度在 2 到16 个字符", trigger: "blur" },
+        ],
+        company: [
+          { required: true, message: "请输入公司名称", trigger: "blur" },
+        ],
+        work_address: [
+          { required: true, message: "请输入工作地址", trigger: "blur" },
+        ],
+        collegeClass: [
+          { required: true, message: "请选择学院和班级", trigger: "blur" },
+        ],
+        time: [{ required: true, message: "请选择毕业时间", trigger: "blur" }],
       },
+      imageUrl: "",
+      actionUrl: process.env.VUE_APP_BASE_API + "/users/uploadHeadPortrait",
+      imageUrl1: "",
+      options: [],
       // 修改用户对话框的显示/隐藏
       editDialogVisible: false,
       // 修改用户查询的表单数据
       editForm: {
         name: "",
-        college: "",
-        class: "",
+        sex: "",
+        number: "",
+        password: "",
         telephone: "",
+        address: "",
         title: "",
-      },
-      editFormRules: {
-        name: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 2, max: 4, message: "用户名长度在2~4之间", trigger: "blur" },
-        ],
-        college: [{ required: true, message: "请输入学院", trigger: "blur" }],
-        class: [{ required: true, message: "请输入班级", trigger: "blur" }],
-        telephone: [{ required: true, message: "请输入电话", trigger: "blur" }],
-        title: [{ required: true, message: "请输入工作职称", trigger: "blur" }],
+        company: "",
+        work_address: "",
+        collegeClass: [],
+        time: "",
       },
       // 分配角色
       changeDialogVisible: false,
@@ -266,6 +531,15 @@ export default {
     };
   },
   methods: {
+    handlePreview(file) {
+      this.$message.success("选择头像成功");
+      console.log(file);
+    },
+    getOptions() {
+      getOptions().then((data) => {
+        this.options = data.data.data;
+      });
+    },
     async getUserList() {
       getUserInfos(this.queryInfo).then((data) => {
         let { status, result, total } = data.data;
@@ -294,9 +568,16 @@ export default {
         // 发起添加用户的网络请求
         postUserInfo(this.addForm).then((data) => {
           const { status } = data.data;
-          if (status !== 2001) return this.$message.error("添加用户失败");
-          this.$message.success("添加用户成功");
-          this.addDialogVisible = false;
+          if (status == 2004) {
+            this.$message.error("用户已存在");
+          } else if (status == 2002) {
+            this.$message.error("注册失败");
+          } else {
+            this.$message.success("注册成功");
+            this.$refs.upload.submit();
+            this.addForm = {};
+            this.addDialogVisible = false;
+          }
           this.getUserList();
         });
       });
@@ -312,6 +593,14 @@ export default {
         const { status, result } = data.data;
         if (!status == 2001) return this.$message.error("查询用户信息失败");
         this.editForm = result[0];
+        this.editForm.collegeClass = [];
+        this.editForm.collegeClass.push(result[0].college);
+        this.editForm.collegeClass.push(result[0].class);
+        this.imageUrl1 =
+          process.env.VUE_APP_UPLOAD_URL_HEAD_PORTRAIT + result[0].photo;
+        console.log(
+          process.env.VUE_APP_UPLOAD_URL_HEAD_PORTRAIT + result[0].photo
+        );
       });
     },
     // 修改用户信息并提交
@@ -323,6 +612,7 @@ export default {
           const { status } = data.data;
           if (status !== 2001) return this.$message.error("修改用户信息失败");
           this.$message.success("修改用户信息成功");
+          this.$refs.upload1.submit();
           this.editDialogVisible = false;
           this.getUserList();
         });
@@ -359,23 +649,43 @@ export default {
         this.changeForm = result[0];
       });
     },
-    async handleChange() {
+    handleChange() {
       updateUserRole(this.changeForm.number, this.changeForm.type).then(
         (data) => {
           const { status } = data.data;
           if (status !== 2001) return this.$message.error("用户权限修改失败");
           this.$message.success("用户权限修改成功");
-          Cookies.setItem("type", this.changeForm.type);
           this.changeDialogVisible = false;
         }
       );
-      const { data: res } = await this.$http.put("/Home/userFirst/up", {
-        number: this.changeForm.number,
-        status: this.changeForm.status,
-      });
     },
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+/* 头像 */
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+</style>

@@ -20,11 +20,10 @@
             class="avatar-uploader"
             ref="picUpload"
             :action="picUrl"
-            :on-change="handlePreview"
-            :before-upload="beforeAvatarUpload"
             :auto-upload="false"
             :limit="1"
             :multiple="false"
+            accept=".jpg,.png"
           >
             <img v-if="imageUrl" :src="imageUrl" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -43,7 +42,6 @@
             :action="actionUrl"
             :file-list="fileList"
             :auto-upload="false"
-            :headers="herderObject"
             accept=".pdf"
             :limit="1"
           >
@@ -65,11 +63,7 @@
         <el-table-column label="#" type="index"></el-table-column>
         <el-table-column label="图片">
           <template slot-scope="scope">
-            <img
-              :src="imgUrl + scope.row.picName"
-              alt=""
-              style="width: 150px"
-            />
+            <img :src="imgUrl + scope.row.picName" style="width: 150px" />
           </template>
         </el-table-column>
         <el-table-column label="姓名" prop="name"></el-table-column>
@@ -168,14 +162,11 @@ export default {
     return {
       showForm: {},
       // 图片
-      picUrl: "http://127.0.0.1:5001/Home/showSecond/upload1",
-      actionUrl: "http://127.0.0.1:5001/Home/showSecond/upload2",
+      picUrl: process.env.VUE_APP_BASE_API + "/sh/uploadShowP",
+      actionUrl: process.env.VUE_APP_BASE_API + "/sh/uploadShowD",
       imageUrl: "",
       dialogImageUrl: "",
       dialogVisible: false,
-      herderObject: {
-        Authorization: window.sessionStorage.getItem("token"),
-      },
       fileList: [],
       // 获取用户列表
       queryInfo: {
@@ -205,29 +196,16 @@ export default {
     };
   },
   methods: {
-    handlePreview(res, file) {
-      var blob = new Blob([file.row]);
-      this.imageUrl = URL.createObjectURL(blob);
-      this.dialogImageUrl = this.imageUrl;
-    },
-    beforeAvatarUpload(file) {
-      const isJPG = file.type === "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
-      }
-      if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
-      }
-      return isJPG && isLt2M;
-    },
     formSubmit() {
       postShowInfo(this.showForm).then((data) => {
         const { status } = data.data;
         if (status == 2001) {
           this.$refs.picUpload.submit();
           this.$refs.pdfUpload.submit();
+          setTimeout(() => {
+            this.$message.success("上传成功");
+            this.getShowList();
+          });
         } else {
           this.$message.error("上传失败");
         }
@@ -294,6 +272,7 @@ export default {
       }
       deleteShowInfo(id).then((data) => {
         const { status } = data.data;
+        console.log(data);
         if (status !== 2001) return this.$message.error("删除用户失败");
         this.$message.success("删除用户成功");
         this.getShowList();

@@ -13,13 +13,8 @@
         class="upload-demo"
         ref="upload"
         :action="actionUrl"
-        :on-preview="handlePreview"
-        :on-remove="handleRemove"
-        :on-success="handleSuccess"
-        :on-error="handleError"
         :file-list="fileList"
         :auto-upload="false"
-        :headers="herderObject"
         accept=".pdf"
         :limit="1"
       >
@@ -34,7 +29,7 @@
           >上传到服务器</el-button
         >
         <div slot="tip" class="el-upload__tip">
-          只能上传pdf文件，且只能单个上传
+          只能上传pdf文件，且只能单个上传,再次上传请将上次上传列表删除
         </div>
       </el-upload>
       <!-- 表格 -->
@@ -130,11 +125,8 @@ export default {
   name: "StateSecond",
   data() {
     return {
-      actionUrl: "http://127.0.0.1:5001/upload",
+      actionUrl: process.env.VUE_APP_BASE_API + "/state1/uploadState",
       fileList: [],
-      herderObject: {
-        Authorization: window.sessionStorage.getItem("token"),
-      },
       // 表格
       queryInfo: {
         query: "",
@@ -159,31 +151,12 @@ export default {
     };
   },
   methods: {
-    handleRemove(file, fileList) {
-      console.log(file, "@@", fileList);
-    },
-    handlePreview(file) {
-      console.log(file);
-    },
-    handleExceed(files, fileList) {
-      this.$message.error(
-        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${
-          files.length + fileList.length
-        } 个文件`
-      );
-    },
-    beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
-    },
-    handleSuccess(response, file, fileList) {
-      this.$message.success("上传成功");
-      console.log(response, file, fileList);
-    },
-    handleError(err, file, fileList) {
-      console.log("上传失败");
-    },
     submitUpload() {
       this.$refs.upload.submit();
+      this.$message.success("上传成功");
+      setTimeout(() => {
+        this.getStateList();
+      }, 1000);
     },
     // 表格
     // 监听的pageSize
@@ -211,6 +184,7 @@ export default {
     // 展示修改用户信息
     async showEditDialog(id) {
       this.editDialogVisible = true;
+      console.log(id);
       getPersonStateInfo(id).then((data) => {
         const { status, result } = data.data;
         if (status !== 2001) return this.$message.error("查询用户信息失败");
