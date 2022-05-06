@@ -17,7 +17,6 @@
               :action="actionUrl"
               :show-file-list="false"
               :limit="1"
-              :on-change="handlePreview"
               accept=".jpg,.png"
               :multiple="false"
               :auto-upload="false"
@@ -198,11 +197,6 @@ export default {
       this.disabled1 = false;
     },
     //   头像
-    handlePreview(res, file) {
-      var blob = new Blob([file.row]);
-      this.imageUrl = URL.createObjectURL(blob);
-      this.dialogImageUrl = this.imageUrl;
-    },
     onSubmit() {
       UpdateUserInfo(this.infoForm.number, this.infoForm).then((data) => {
         if (data.data.status !== 2001) {
@@ -215,13 +209,12 @@ export default {
       });
     },
     getRequestInfo() {
-      let number = window.sessionStorage.getItem("number");
+      let number = Cookies.get("number");
       getPersonRequestInfo(number).then((data) => {
-        console.log(data);
         if (data.data.status !== 2001) {
           return this.$message.error(data.data.msg);
         }
-        this.tableData = data.result;
+        this.tableData = data.data.result;
       });
     },
   },

@@ -67,7 +67,7 @@ export default {
       img1: process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE1,
       img2: process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE2,
       img3: process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE3,
-      img4: process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE3,
+      img4: process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE4,
     };
   },
   methods: {
@@ -97,7 +97,7 @@ export default {
         return this.$message.info("已经取消删除");
       }
       deleteForum(idForum).then((data) => {
-        if (data.data.status !== 200)
+        if (data.data.status !== 2001)
           return this.$message.error("删除用户失败");
         this.$message.success("删除用户成功");
         this.getForum();

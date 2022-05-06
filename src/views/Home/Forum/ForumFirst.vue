@@ -84,7 +84,6 @@
             :action="actionUrl1"
             :auto-upload="false"
             :on-change="handleChao"
-            :headers="herderObject"
             accept=".jpg"
             :limit="1"
               >
@@ -98,7 +97,6 @@
             :action="actionUrl2"
             :auto-upload="false"
             :on-change="handleChao"
-            :headers="herderObject"
             accept=".jpg"
             :limit="1"
               >
@@ -112,7 +110,6 @@
             :action="actionUrl3"
             :auto-upload="false"
             :on-change="handleChao"
-            :headers="herderObject"
             accept=".jpg"
             :limit="1"
               >
@@ -126,7 +123,6 @@
             :action="actionUrl4"
             :auto-upload="false"
             :on-change="handleChao"
-            :headers="herderObject"
             accept=".jpg"
             :limit="1"
               >
@@ -156,19 +152,16 @@ export default {
       editForm:{},
       editDialogVisible2:false,
       picForm:{},
-      actionUrl1:"http://127.0.0.1:5001/Home/ForumSecond/upload1",
-      actionUrl2:"http://127.0.0.1:5001/Home/ForumSecond/upload2",
-      actionUrl3:"http://127.0.0.1:5001/Home/ForumSecond/upload3",
-      actionUrl4:"http://127.0.0.1:5001/Home/ForumSecond/upload4",
-      herderObject: {
-        Authorization: window.sessionStorage.getItem("token"),
-      },
+      actionUrl1:process.env.VUE_APP_BASE_API+"/fo/uploadPicture1",
+      actionUrl2:process.env.VUE_APP_BASE_API+"/fo/uploadPicture2",
+      actionUrl3:process.env.VUE_APP_BASE_API+"/fo/uploadPicture3",
+      actionUrl4:process.env.VUE_APP_BASE_API+"/fo/uploadPicture4",
       data:{},
       photoImg:process.env.VUE_APP_UPLOAD_URL_SHOW_PICTURES,
       img1:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE1,
       img2:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE2,
       img3:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE3,
-      img4:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE3,
+      img4:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE4,
       give:"",
 
     }
@@ -184,7 +177,6 @@ export default {
     },
     getForum(){
       getForumInfo().then((data)=>{
-        console.log("getForumInfo",data);
         if (data.data.status!==2001) {
           this.$message.error('数据获取失败')
         }else{
@@ -207,7 +199,6 @@ export default {
     fontSubmit(){
       let number = Cookies.get('number')
       postFontForum(this.editForm,number).then((data)=>{
-        console.log("postFontForum",data);
         if (data.data.status!==2001) {
           this.$message.error('文字发布失败')
         }else{
@@ -222,7 +213,7 @@ export default {
       let number = Cookies.get('number')
       postPicForum(this.picForm,number).then((data)=>{
         console.log("postFontForum",data);
-        if (data.data.status!==200) {
+        if (data.data.status!==2001) {
           this.$message.error('图片发布失败')
         }else{
           this.$refs.pic1Upload.submit()

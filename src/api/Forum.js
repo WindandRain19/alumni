@@ -47,7 +47,7 @@ export function postPicForum(picForm, number) {
 // 删除留言
 export function deleteForum(idForum) {
   return request({
-    url: "/fo/Forum"+idForum,
+    url: "/fo/Forum/"+idForum,
     method: "delete",
   });
 }
