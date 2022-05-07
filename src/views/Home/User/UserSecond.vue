@@ -10,7 +10,7 @@
     <div class="cardBox">
       <div class="card-left">
         <h3>个人信息</h3>
-        <el-form ref="infoFormRef" :model="infoForm" label-width="100px">
+        <el-form ref="infoFormRef" :model="infoForm" label-width="100px" border>
           <el-form-item label="头像">
             <el-upload
               class="avatar-uploader"
@@ -33,34 +33,49 @@
               v-if="check_image"
             ></el-image>
           </el-form-item>
-          <el-form-item label="姓名">
-            <el-input
-              v-model="infoForm.name"
-              :disabled="disabled1"
-              style="width: 30%"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="学号">
-            <el-input
-              v-model="infoForm.number"
-              disabled
-              style="width: 30%"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="密码">
-            <el-input
-              v-model="infoForm.password"
-              :disabled="disabled1"
-              style="width: 30%"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="电话">
-            <el-input
-              v-model="infoForm.telephone"
-              style="width: 30%"
-              :disabled="disabled1"
-            ></el-input>
-          </el-form-item>
+
+          <table>
+            <tr>
+              <th>
+                <el-form-item label="姓名">
+                  <el-input
+                    v-model="infoForm.name"
+                    :disabled="disabled1"
+                    style="width: 100%"
+                  ></el-input>
+                </el-form-item>
+              </th>
+              <th>
+                <el-form-item label="学号">
+                  <el-input
+                    v-model="infoForm.number"
+                    disabled
+                    style="width: 100%"
+                  ></el-input>
+                </el-form-item>
+              </th>
+            </tr>
+            <tr>
+              <th>
+                <el-form-item label="密码">
+                  <el-input
+                    v-model="infoForm.password"
+                    :disabled="disabled1"
+                    style="width: 100%"
+                  ></el-input>
+                </el-form-item>
+              </th>
+              <th>
+                <el-form-item label="电话">
+                  <el-input
+                    v-model="infoForm.telephone"
+                    style="width: 100%"
+                    :disabled="disabled1"
+                  ></el-input>
+                </el-form-item>
+              </th>
+            </tr>
+          </table>
           <el-form-item label="现住址">
             <el-input
               v-model="infoForm.address"
@@ -273,11 +288,13 @@ export default {
   justify-content: space-between;
 }
 .card-left {
-  width: 50%;
-  background-color: rgba(255, 255, 255, 0.5);
+  padding: 20px;
+  width: 48%;
+  background-color: rgba(255, 255, 255, 0.7);
 }
 .card-right {
-  width: 50%;
-  background-color: rgba(255, 255, 255, 0.3);
+  padding: 20px;
+  width: 48%;
+  background-color: rgba(255, 255, 255, 0.5);
 }
 </style>
