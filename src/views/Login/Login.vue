@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <el-card class="box-card">
+    <div class="box-card1">
       <h3 class="title">校友服务管理系统</h3>
       <el-form ref="loginForm" :model="loginForm" :rules="loginRules">
         <el-form-item label="用户类型">
@@ -59,7 +59,7 @@
           </el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
   </div>
 </template>
 
@@ -146,17 +146,20 @@ export default {
             .then((code) => {
               switch (code) {
                 case 2000:
-                  alert("用户不存在");
+                  this.$message.error("用户不存在");
                   break;
                 case 2001:
-                  alert("登录成功");
+                  this.$message.success("登录成功");
                   this.$router.push("/Home");
                   break;
                 case 2002:
-                  alert("密码错误");
+                  this.$message.error("密码错误");
                   break;
                 case 2003:
-                  alert("验证码不正确");
+                  this.$message.error("验证码不正确");
+                  break;
+                case 2004:
+                  this.$message.error("所选类型不匹配");
                   break;
                 default:
                   break;
@@ -188,7 +191,15 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-image: url("../../assets/logo.png");
+  background-image: url("../../assets/main-background.jpg");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+.box-card1 {
+  background: #ffffff;
+  box-shadow: 0px 0px 27px 0px rgba(148, 192, 253, 0.28);
+  padding: 40px;
+  border-radius: 10px;
 }
 .title {
   margin: 0px auto 30px auto;

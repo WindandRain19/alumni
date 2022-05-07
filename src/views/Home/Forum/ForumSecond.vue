@@ -8,7 +8,7 @@
     </el-breadcrumb>
 
     <!-- 卡片区 -->
-    <el-card class="box-card">
+    <div class="box-card-fs">
       <el-table :data="ForumList" style="width: 100%" max-height="800">
         <el-table-column fixed label="#" type="index" width="100">
         </el-table-column>
@@ -50,7 +50,7 @@
           </template>
         </el-table-column>
       </el-table>
-    </el-card>
+    </div>
   </div>
 </template>
 
@@ -107,4 +107,13 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.box-card-fs {
+  width: 1400px;
+  background-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0px 0px 27px 0px rgba(148, 192, 253, 0.28);
+  padding: 20px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+</style>

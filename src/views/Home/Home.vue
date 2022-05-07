@@ -1,9 +1,11 @@
 <template>
-  <el-container class="home_container">
+  <div class="home-container">
     <!-- 头部 -->
     <el-header>
       <div>
-        <img src="../../assets/logo.png" alt="" />
+        <div class="logo">
+          <div><img src="../../assets/logo.png" alt="" /></div>
+        </div>
         <span>校友服务管理系统</span>
       </div>
       <el-button type="info" @click="logout">退出</el-button></el-header
@@ -51,14 +53,21 @@
         </el-menu>
       </el-aside>
       <!-- 右侧内容 -->
-      <el-main><router-view></router-view></el-main>
+      <div class="main">
+        <div class="main-layer">
+          <div class="main-header"></div>
+          <div class="main-body">
+            <router-view></router-view>
+          </div>
+        </div>
+      </div>
     </el-container>
-  </el-container>
+  </div>
 </template>
 
 <script>
 import Cookies from "js-cookie";
-import { getMenuList } from "../../api/Menu";
+import { getMenuList } from "@/api/Menu";
 export default {
   created() {
     this.getMenuList();
@@ -86,7 +95,7 @@ export default {
     // 退出登录
     logout() {
       window.sessionStorage.clear();
-      this.$router.push("./Login");
+      this.$router.push("/Login");
     },
     // 获取所有菜单
     getMenuList() {
@@ -129,12 +138,29 @@ export default {
   display: flex;
   align-items: center;
 }
-
+.logo {
+  width: 200px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+}
+.logo > div {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #871f27;
+}
+.logo > div > img {
+  width: 60px;
+  height: 60px;
+}
 .el-header > div > span {
   margin-left: 15px;
 }
 
-.home_container {
+.home-container {
+  display: flex;
+  flex-direction: column;
   height: 100%;
 }
 
@@ -158,5 +184,25 @@ export default {
   text-align: center;
   letter-spacing: 0.2em;
   cursor: pointer;
+}
+.main {
+  flex: 1;
+  position: relative;
+  background-image: url("../../assets/main-background.jpg");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+.main-layer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+}
+.main-body {
+  flex: 1;
+  overflow: auto;
 }
 </style>

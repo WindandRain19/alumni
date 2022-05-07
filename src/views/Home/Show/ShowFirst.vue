@@ -8,17 +8,17 @@
     </el-breadcrumb>
 
     <!-- 卡片 -->
-    <el-card class="box-card">
+    <div class="box-card-sf">
       <!-- 校友风采列表去 -->
       <el-table :data="showUsersList" border stripe>
         <el-table-column label="#" type="index"></el-table-column>
         <el-table-column label="图片" width="200px">
           <template slot-scope="scope">
-            <img
+            <el-image
               :src="imgUrl + scope.row.picName"
-              alt=""
               style="width: 150px"
-            />
+              :preview-src-list="[imgUrl + scope.row.picName]"
+            ></el-image>
           </template>
         </el-table-column>
         <el-table-column
@@ -57,12 +57,12 @@
         :total="total"
       >
       </el-pagination>
-    </el-card>
+    </div>
   </div>
 </template>
 
 <script>
-import { getShowInfo } from "../../../api/Show";
+import { getShowInfo, getPersonShowInfo } from "../../../api/Show";
 export default {
   created() {
     this.getShowList();
@@ -82,15 +82,17 @@ export default {
       total: 0,
       imgUrl: process.env.VUE_APP_UPLOAD_URL_SHOW_PICTURES,
       pdfUrl: process.env.VUE_APP_UPLOAD_URL_SHOW_DOCUMENT,
+      // 图片列表
+      srcList: [],
     };
   },
   methods: {
     getShowList() {
       getShowInfo(this.queryInfo).then((data) => {
-        if (data.data.status !== 2001)
-          return this.$message.error("用户列表获取失败");
-        this.showUsersList = data.data.result;
-        this.total = data.data.total;
+        const { status, total, result } = data.data;
+        if (status !== 2001) return this.$message.error("用户列表获取失败");
+        this.showUsersList = result;
+        this.total = total;
       });
     },
     handleSizeChange(newSize) {
@@ -106,4 +108,13 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style>
+.box-card-sf {
+  width: 1200px;
+  background-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0px 0px 27px 0px rgba(148, 192, 253, 0.28);
+  padding: 20px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+</style>

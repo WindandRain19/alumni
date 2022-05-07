@@ -8,7 +8,7 @@
     </el-breadcrumb>
 
     <!-- 卡片视图 -->
-    <el-card>
+    <div class="box-card-uf">
       <!-- 搜索与添加区域 -->
       <el-row :gutter="20">
         <el-col :span="7">
@@ -93,7 +93,7 @@
         :total="total"
       >
       </el-pagination>
-    </el-card>
+    </div>
 
     <!-- 添加用户的对话框 -->
     <el-dialog
@@ -285,7 +285,7 @@
           </tr>
           <tr>
             <th>
-              <el-form-item label="学号" prop="number" >
+              <el-form-item label="学号" prop="number">
                 <el-input
                   v-model="editForm.number"
                   style="width: 90%"
@@ -687,5 +687,14 @@ export default {
   width: 178px;
   height: 178px;
   display: block;
+}
+
+.box-card-uf {
+  width: 1200px;
+  background-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0px 0px 27px 0px rgba(148, 192, 253, 0.28);
+  padding: 20px;
+  margin: 0 auto;
+  border-radius: 10px;
 }
 </style>

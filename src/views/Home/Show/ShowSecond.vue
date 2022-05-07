@@ -8,12 +8,12 @@
     </el-breadcrumb>
 
     <!-- 提交校友风采 -->
-    <el-card>
+    <div class="box-card-fs">
       <el-form
         ref="showRef"
         :model="showForm"
         label-width="80px;"
-        style="border: 1px solid rgb(225, 225, 225, 0.5); padding-left: 10px"
+        style="border: 1px solid rgb(225, 225, 225, 1); padding-left: 10px"
       >
         <el-form-item label="图片">
           <el-upload
@@ -111,7 +111,7 @@
         :total="total"
       >
       </el-pagination>
-    </el-card>
+    </div>
 
     <!-- 修改风采对话框 -->
     <el-dialog
@@ -305,5 +305,13 @@ export default {
   width: 178px;
   height: 178px;
   display: block;
+}
+.box-card-fs {
+  width: 1200px;
+  background-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0px 0px 27px 0px rgba(148, 192, 253, 0.28);
+  padding: 20px;
+  margin: 0 auto;
+  border-radius: 10px;
 }
 </style>

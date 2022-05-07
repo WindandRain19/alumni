@@ -7,7 +7,7 @@
       <el-breadcrumb-item>校友申请</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡品视图 -->
-    <el-card class="box-card">
+    <div class="box-card-rf">
       <!--申请表格 -->
       <el-form
         ref="formRef"
@@ -16,15 +16,24 @@
         label-width="80px"
       >
         <el-form-item label="活动名称" prop="name" required>
-          <el-input v-model="requestForm.name" style="width: 40%"></el-input>
+          <el-input
+            v-model="requestForm.name"
+            style="width: 80%"
+            placeholder="请输入活动名称"
+          ></el-input>
         </el-form-item>
         <el-form-item label="负责人" prop="user" required>
-          <el-input v-model="requestForm.user" style="width: 40%"></el-input>
+          <el-input
+            v-model="requestForm.user"
+            style="width: 40%"
+            placeholder="请输入负责人"
+          ></el-input>
         </el-form-item>
         <el-form-item label="电话" prop="telephone" required>
           <el-input
             v-model="requestForm.telephone"
             style="width: 40%"
+            placeholder="请输入电话"
           ></el-input>
         </el-form-item>
         <el-form-item label="活动区域" prop="region" required>
@@ -68,14 +77,16 @@
           <el-input
             type="textarea"
             v-model="requestForm.introduction"
-            style="width: 40%"
+            style="width: 80%"
           ></el-input>
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="onSubmit">确认</el-button>
+        <el-form-item class="item-button">
+          <el-button class="button" type="primary" @click="onSubmit"
+            >确认</el-button
+          >
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
   </div>
 </template>
 
@@ -139,10 +150,28 @@ export default {
 </script>
 
 <style scoped>
+/* ====time====start */
 .el-col {
   width: 130px;
 }
 .date_w {
   width: 20px;
+}
+/* ====time====end */
+
+/* ====box-card-rf====start */
+.box-card-rf {
+  padding: 40px;
+  width: 800px;
+  margin: 100px auto;
+  box-shadow: 0px 0px 27px 0px rgba(148, 192, 253, 0.28);
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+/* ====box-card-rf====end */
+
+.button{
+  margin-top: 50px;
+  margin-left: 600px;
 }
 </style>

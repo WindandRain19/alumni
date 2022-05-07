@@ -8,7 +8,8 @@
     </el-breadcrumb>
 
     <div class="cardBox">
-      <el-card class="card-left">
+      <div class="card-left">
+        <h3>个人信息</h3>
         <el-form ref="infoFormRef" :model="infoForm" label-width="100px">
           <el-form-item label="头像">
             <el-upload
@@ -20,10 +21,17 @@
               accept=".jpg,.png"
               :multiple="false"
               :auto-upload="false"
+              v-if="check_upload"
             >
               <img v-if="imageUrl" :src="imageUrl" class="avatar" />
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
+            <el-image
+              :src="imageUrl"
+              style="width: 150px"
+              :preview-src-list="[imageUrl]"
+              v-if="check_image"
+            ></el-image>
           </el-form-item>
           <el-form-item label="姓名">
             <el-input
@@ -56,7 +64,7 @@
           <el-form-item label="现住址">
             <el-input
               v-model="infoForm.address"
-              style="width: 30%"
+              style="width: 80%"
               :disabled="disabled1"
             ></el-input>
           </el-form-item>
@@ -70,14 +78,14 @@
           <el-form-item label="公司名称">
             <el-input
               v-model="infoForm.company"
-              style="width: 50%"
+              style="width: 80%"
               :disabled="disabled1"
             ></el-input>
           </el-form-item>
           <el-form-item label="公司地址">
             <el-input
               v-model="infoForm.work_address"
-              style="width: 50%"
+              style="width: 80%"
               :disabled="disabled1"
             ></el-input>
           </el-form-item>
@@ -105,13 +113,17 @@
           </el-form-item>
           <el-form-item>
             <el-button type="warning" @click="change">修改</el-button>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="onSubmit">立即创建</el-button>
+            <el-button
+              type="primary"
+              @click="onSubmit"
+              :disabled="button_disabled"
+              >确认</el-button
+            >
           </el-form-item>
         </el-form>
-      </el-card>
-      <el-card class="card-right">
+      </div>
+      <div class="card-right">
+        <h3>申请</h3>
         <el-table :data="tableData" style="width: 100%">
           <el-table-column type="index" label="#" width="180">
           </el-table-column>
@@ -130,7 +142,7 @@
             </template>
           </el-table-column>
         </el-table>
-      </el-card>
+      </div>
     </div>
   </div>
 </template>
@@ -167,6 +179,9 @@ export default {
       actionUrl: "http://127.0.0.1:5001/Home/stateSecond/upload",
       options: [],
       tableData: [],
+      button_disabled: true,
+      check_upload: false,
+      check_image: true,
     };
   },
   methods: {
@@ -176,12 +191,12 @@ export default {
         this.options = data.data.data;
       });
     },
-    async getUserInfo() {
+    getUserInfo() {
       let number = Cookies.get("number");
       getUserInfo(number).then((data) => {
-        const { result } = data.data;
-        if (data.data.status != 2001) {
-          this.$message.error(data.data.msg);
+        const { status, result, msg } = data.data;
+        if (status != 2001) {
+          this.$message.error(msg);
         } else {
           this.infoForm = result[0];
           this.infoForm.collegeClass = [];
@@ -189,21 +204,28 @@ export default {
           this.infoForm.collegeClass.push(result[0].class);
           this.imageUrl =
             process.env.VUE_APP_UPLOAD_URL_HEAD_PORTRAIT + result[0].photo;
-          this.$message.success(data.data.msg);
+          this.$message.success(msg);
         }
       });
     },
     change() {
       this.disabled1 = false;
+      this.button_disabled = false;
+      this.check_upload = true;
+      this.check_image = false;
     },
     //   头像
     onSubmit() {
       UpdateUserInfo(this.infoForm.number, this.infoForm).then((data) => {
-        if (data.data.status !== 2001) {
-          this.$message.error(data.data.msg);
+        const { status, msg } = data.data;
+        if (status !== 2001) {
+          this.$message.error(msg);
         } else {
-          this.$message.success(data.data.msg);
+          this.$message.success(msg);
           this.disabled1 = true;
+          this.button_disabled = true;
+          this.check_upload = false;
+          this.check_image = true;
           this.$refs.upload.submit();
         }
       });
@@ -211,10 +233,11 @@ export default {
     getRequestInfo() {
       let number = Cookies.get("number");
       getPersonRequestInfo(number).then((data) => {
-        if (data.data.status !== 2001) {
-          return this.$message.error(data.data.msg);
+        const { status, result, msg } = data.data;
+        if (status !== 2001) {
+          return this.$message.error(msg);
         }
-        this.tableData = data.data.result;
+        this.tableData = result;
       });
     },
   },
@@ -251,8 +274,10 @@ export default {
 }
 .card-left {
   width: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
 }
 .card-right {
   width: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
 }
 </style>

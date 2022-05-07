@@ -8,11 +8,11 @@
     </el-breadcrumb>
 
     <!-- 卡片区 -->
-    <el-card class="box-card card">
+    <div class="box-card-ff">
       <div class="ForumFirst_header">
-        <el-button type="" icon="el-icon-edit" circle @click="showEditDialog"></el-button>
+        <el-button class="font-button" icon="el-icon-edit" circle @click="showEditDialog"></el-button>
         <el-button
-          type=""
+          class="pic-button"
           icon="el-icon-picture-outline"
           circle
           @click="showEditDialog1"
@@ -22,7 +22,7 @@
         <div class="box_left">
           <div class="name">{{item.name}}</div>
           <div class="photo">
-            <img :src="photoImg + item.photo" alt="" />
+            <el-image class="photo-img" :src="photoImg + item.photo" :preview-src-list="[photoImg + item.photo]"></el-image>
           </div>
         </div>
         <div class="box_right">
@@ -30,10 +30,10 @@
             <span>{{item.article}}</span>
           </div>
           <div class="picture">
-            <el-image class="img" v-if="(item.pic1==null)? false:true" :src="img1+item.pic1"></el-image>
-            <el-image class="img" v-if="(item.pic2==null)? false:true" :src="img2+item.pic2"></el-image>
-            <el-image class="img" v-if="(item.pic3==null)? false:true" :src="img3+item.pic3"></el-image>
-            <el-image class="img" v-if="(item.pic4==null)? false:true" :src="img4+item.pic4"></el-image>
+            <el-image class="img" v-if="(item.pic1==null)? false:true" :src="img1+item.pic1" :preview-src-list="[img1+item.pic1]"></el-image>
+            <el-image class="img" v-if="(item.pic2==null)? false:true" :src="img2+item.pic2" :preview-src-list="[img2+item.pic2]"></el-image>
+            <el-image class="img" v-if="(item.pic3==null)? false:true" :src="img3+item.pic3" :preview-src-list="[img3+item.pic3]"></el-image>
+            <el-image class="img" v-if="(item.pic4==null)? false:true" :src="img4+item.pic4" :preview-src-list="[img4+item.pic4]"></el-image>
           </div>
           <div class="footer">
             <div class="footer_left">{{item.time}}</div>
@@ -46,7 +46,7 @@
           </div>
         </div>
       </div>
-    </el-card>
+    </div>
 
     <!-- 单文本 -->
     <el-dialog
@@ -139,7 +139,7 @@
 </template>
 
 <script>
-import { getForumFive,getForumInfo,postFontForum,postPicForum } from "../../../api/Forum"
+import { getForumFive,getForumInfo,postFontForum,postPicForum,getPersonForumInfo } from "../../../api/Forum"
 import Cookies from "js-cookie";
 export default {
   created(){
@@ -169,18 +169,20 @@ export default {
   methods:{
     handleGive(give,time){
       getForumFive(give,time).then((data)=>{  
-        console.log("getForumFive",data);
-        if (data.data.status == 2001) {
+        const{status} = data.data
+        if (status == 2001) {
           this.getForum()
         }
       })
     },
+
     getForum(){
       getForumInfo().then((data)=>{
-        if (data.data.status!==2001) {
+        const{status,result} = data.data
+        if (status!==2001) {
           this.$message.error('数据获取失败')
         }else{
-          this.data=data.data.result
+          this.data=result
         }
       })
     },
@@ -231,12 +233,25 @@ export default {
 </script>
 
 <style scoped>
+.box-card-ff{
+  width: 1400px;
+  background-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0px 0px 27px 0px rgba(148, 192, 253, 0.28);
+  padding: 20px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
 .ForumFirst_header {
   display: flex;
   justify-content: flex-end;
 }
-.card{
-  background-color: rgba(90,90,54,0.05) 
+.font-button{
+  box-shadow: 0px 0px 27px 0px rgba(148, 192, 253, 0.28);
+
+}
+.pic-button{
+  box-shadow: 0px 0px 27px 0px rgba(148, 192, 253, 0.28);
+  margin-right: 20px;
 }
 .box {
   display: flex;
@@ -244,11 +259,13 @@ export default {
   margin: 10px auto;
   border-radius: 20px;
   background-color: #fff;
+  box-shadow: 0px 0px 27px 0px rgba(148, 192, 253, 0.28);
 }
 .box_left {
   width: 30%;
   display: flex;
   justify-content: flex-start;
+  
 }
 .box_right {
   width: 70%;
@@ -263,6 +280,8 @@ export default {
   margin-right: 20px;
   line-height: 50px;
   text-align: right;
+  font-size: 28px;
+  font-weight: 400;
 }
 .photo {
   width: 120px;
@@ -271,8 +290,9 @@ export default {
   margin-top: 20px;
   margin-bottom: 20px;
   border-radius: 50%;
+  padding-top: 30px;
 }
-.photo > img {
+.photo-img {
   width: 100%;
   height: 100%;
   border-radius: 50%;
@@ -280,6 +300,7 @@ export default {
 .article {
   width: 90%;
   height: 50px;
+  margin-left: 10px;
 }
 .article > span {
   font-size: 20px;

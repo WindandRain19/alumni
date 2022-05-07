@@ -264,7 +264,9 @@ export default {
 <style scoped>
 .Register_container {
   background-color: #2b4b6b;
-  height: 100%;
+  overflow-y: scroll;
+  width: 100%;
+  height: 930px;
 }
 .Register_header {
   height: 100px;

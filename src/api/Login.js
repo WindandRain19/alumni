@@ -1,10 +1,11 @@
-import request from "../utils/request"
+import request from "../utils/request";
 
-export function Login(number, password,img_code) {
+export function Login(number, password, img_code, type) {
   const data = {
     number,
     password,
-    img_code
+    img_code,
+    type,
   };
   return request({
     url: "/Login",
@@ -12,4 +13,3 @@ export function Login(number, password,img_code) {
     data,
   });
 }
-

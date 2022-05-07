@@ -8,7 +8,7 @@
     </el-breadcrumb>
 
     <!-- 卡片区 -->
-    <el-card class="box-card">
+    <div class="box-card-ss">
       <el-upload
         class="upload-demo"
         ref="upload"
@@ -80,7 +80,7 @@
         :total="total"
       >
       </el-pagination>
-    </el-card>
+    </div>
 
     <!-- 修改用户对话框 -->
     <el-dialog
@@ -233,4 +233,13 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.box-card-ss {
+  width: 1200px;
+  background-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0px 0px 27px 0px rgba(148, 192, 253, 0.28);
+  padding: 20px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+</style>

@@ -18,8 +18,9 @@ const login = {
       const number = userInfo.number;
       const password = userInfo.password;
       const img_code = userInfo.img_code;
+      const type = userInfo.type;
       return new Promise((resolve, reject) => {
-        Login(number, password, img_code)
+        Login(number, password, img_code, type)
           .then((res) => {
             res = res.data;
             setToken(res.token);
