@@ -15,15 +15,15 @@
             class="avatar-uploader"
             ref="upload"
             :action="actionUrl"
-            :show-file-list="false"
             :limit="1"
             :on-change="handlePreview"
             accept=".jpg,.png"
             :multiple="false"
             :auto-upload="false"
+            :on-remove="handleRemove"
+            list-type="picture"
           >
-            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            <i v-show="!show" class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
         <table Width="100%">
@@ -129,7 +129,7 @@
                     type="date"
                     placeholder="选择日期"
                     v-model="registerForm.time"
-                    style="width: 100%"
+                    style="width: 110%"
                   ></el-date-picker>
                 </el-col>
               </el-form-item>
@@ -138,6 +138,7 @@
         </table>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">立即创建</el-button>
+          <el-button type="info" @click="onSubmitToLogin">返回</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -225,7 +226,7 @@ export default {
         time: [{ required: true, message: "请选择毕业时间", trigger: "blur" }],
       },
       //   头像
-      imageUrl: "",
+      show: false,
       actionUrl: process.env.VUE_APP_BASE_API + "/users/uploadHeadPortrait",
       options: [],
     };
@@ -238,7 +239,15 @@ export default {
     },
     //   头像
     handlePreview(file, fileList) {
+      if (fileList.length > 0) {
+        this.show = true;
+      }
       this.$message.success("选择图片成功");
+    },
+    handleRemove(file, fileList) {
+      if (fileList.length < 1) {
+        this.show = false;
+      }
     },
     onSubmit() {
       this.$refs.registerRef.validate((valid) => {
@@ -257,6 +266,9 @@ export default {
         });
       });
     },
+    onSubmitToLogin(){
+      this.$router.push("/Login");
+    }
   },
 };
 </script>

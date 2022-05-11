@@ -16,7 +16,7 @@
           <template slot-scope="scope">
             <el-image
               :src="imgUrl + scope.row.picName"
-              style="width: 150px"
+              style="width: 150px;height:150px;"
               :preview-src-list="[imgUrl + scope.row.picName]"
             ></el-image>
           </template>

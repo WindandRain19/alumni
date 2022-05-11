@@ -75,7 +75,6 @@ export default {
     // 监听的pageSize
     getStateList() {
       getStateInfo(this.queryInfo).then((data) => {
-        console.log(data);
         if (data.data.status !== 2001)
           return this.$message.error("动态列表获取失败");
         this.statesList = data.data.result;

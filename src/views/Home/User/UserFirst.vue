@@ -114,15 +114,15 @@
             class="avatar-uploader"
             ref="upload"
             :action="actionUrl"
-            :show-file-list="false"
             :limit="1"
             :on-change="handlePreview"
+            :on-remove="handleRemove"
+            list-type="picture"
             accept=".jpg,.png"
             :multiple="false"
             :auto-upload="false"
           >
-            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            <i v-show="show" class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
         <table Width="100%">
@@ -256,16 +256,29 @@
             class="avatar-uploader"
             ref="upload1"
             :action="actionUrl"
-            :show-file-list="false"
             :limit="1"
-            :on-change="handlePreview"
+            :on-change="handlePreview1"
+            :on-remove="handleRemove1"
+            list-type="picture"
             accept=".jpg,.png"
-            :multiple="false"
             :auto-upload="false"
+            v-if="check_upload"
           >
-            <img v-if="imageUrl1" :src="imageUrl1" class="avatar" />
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            <i v-show="show1" class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
+          <el-image
+            :src="imageUrl1"
+            style="width: 150px"
+            :preview-src-list="[imageUrl1]"
+            v-if="check_image"
+          ></el-image>
+          <el-button
+            type="text"
+            v-show="check_image"
+            @click="openPhoto"
+            style="margin-left: 10px"
+            >移除头像锁定</el-button
+          >
         </el-form-item>
         <table Width="100%">
           <tr>
@@ -528,12 +541,41 @@ export default {
       // 分配角色
       changeDialogVisible: false,
       changeForm: {},
+      show: true,
+      show1: false,
+      check_upload: false,
+      check_image: true,
+      show1Num: 0,
     };
   },
   methods: {
-    handlePreview(file) {
-      this.$message.success("选择头像成功");
-      console.log(file);
+    handleRemove(file, fileList) {
+      if (fileList.length < 1) {
+        this.show = true;
+      }
+    },
+    handlePreview(file, fileList) {
+      if (fileList.length > 0) {
+        this.$message.warning("每次选图最多为1");
+        this.show = false;
+      }
+    },
+    handlePreview1(file, fileList) {
+      if (fileList.length > 0) {
+        this.$message.warning("每次选图最多为1");
+        this.show1Num += 1;
+        this.show1 = false;
+      }
+    },
+    handleRemove1(file, fileList) {
+      if (fileList.length < 1) {
+        this.show1 = true;
+      }
+    },
+    openPhoto() {
+      this.check_image = false;
+      this.check_upload = true;
+      this.show1 = true;
     },
     getOptions() {
       getOptions().then((data) => {
@@ -598,9 +640,6 @@ export default {
         this.editForm.collegeClass.push(result[0].class);
         this.imageUrl1 =
           process.env.VUE_APP_UPLOAD_URL_HEAD_PORTRAIT + result[0].photo;
-        console.log(
-          process.env.VUE_APP_UPLOAD_URL_HEAD_PORTRAIT + result[0].photo
-        );
       });
     },
     // 修改用户信息并提交
@@ -612,9 +651,21 @@ export default {
           const { status } = data.data;
           if (status !== 2001) return this.$message.error("修改用户信息失败");
           this.$message.success("修改用户信息成功");
-          this.$refs.upload1.submit();
-          this.editDialogVisible = false;
-          this.getUserList();
+          if (this.show1Num > 0) {
+            this.$refs.upload1.submit();
+            this.editDialogVisible = false;
+            this.getUserList();
+            this.check_image = true;
+            this.check_upload = false;
+            this.show1 = false;
+            this.show1Num = 0;
+          } else {
+            this.editDialogVisible = false;
+            this.getUserList();
+            this.check_image = true;
+            this.check_upload = false;
+            this.show1 = false;
+          }
         });
       });
     },
@@ -665,16 +716,7 @@ export default {
 
 <style scoped>
 /* 头像 */
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
+
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
@@ -682,11 +724,6 @@ export default {
   height: 178px;
   line-height: 178px;
   text-align: center;
-}
-.avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
 }
 
 .box-card-uf {

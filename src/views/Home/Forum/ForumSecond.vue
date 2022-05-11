@@ -20,22 +20,22 @@
         </el-table-column>
         <el-table-column prop="pic1" label="图片1" width="200">
           <template slot-scope="scope">
-            <img :src="img1 + scope.row.pic1" alt="" style="width: 150px" />
+            <el-image v-if="(scope.row.pic1==null)? false:true" :src="img1 + scope.row.pic1" :preview-src-list="[img1+scope.row.pic1]" style="width: 150px;height:150px;"></el-image>
           </template>
         </el-table-column>
         <el-table-column prop="pic2" label="图片2" width="200">
           <template slot-scope="scope">
-            <img :src="img2 + scope.row.pic2" alt="" style="width: 150px" />
+            <el-image v-if="(scope.row.pic2==null)? false:true" :src="img2 + scope.row.pic2" :preview-src-list="[img2+scope.row.pic2]" style="width: 150px;height:150px;"></el-image>
           </template>
         </el-table-column>
         <el-table-column prop="pic3" label="图片3" width="200">
           <template slot-scope="scope">
-            <img :src="img3 + scope.row.pic3" alt="" style="width: 150px" />
+            <el-image v-if="(scope.row.pic3==null)? false:true" :src="img3 + scope.row.pic3" :preview-src-list="[img3+scope.row.pic3]" style="width: 150px;height:150px;"></el-image>
           </template>
         </el-table-column>
         <el-table-column prop="pic4" label="图片4" width="200">
           <template slot-scope="scope">
-            <img :src="img4 + scope.row.pic4" alt="" style="width: 150px" />
+            <el-image v-if="(scope.row.pic4==null)? false:true" :src="img4 + scope.row.pic4" :preview-src-list="[img4+scope.row.pic4]" style="width: 150px;height:150px;"></el-image>
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="100">

@@ -16,6 +16,14 @@ export function getIdRequestInfo(idRequest) {
   });
 }
 
+// 未通过查询
+export function getIdStatusInfo(type) {
+  return request({
+    url: "/request/status/" + type,
+    method: "get",
+  });
+}
+
 export function postRequest(requestForm, number) {
   const data = {
     requestForm,

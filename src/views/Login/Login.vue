@@ -67,6 +67,7 @@
 import Cookies from "js-cookie";
 export default {
   created() {
+    sessionStorage.removeItem("activePath");
     this.getCookie();
   },
   name: "Login",
@@ -171,7 +172,6 @@ export default {
     },
     // 注册
     Register() {
-      window.sessionStorage.setItem("token", 123);
       this.$router.push("/Register");
     },
     // 获取验证码

@@ -24,9 +24,11 @@
             :limit="1"
             :multiple="false"
             accept=".jpg,.png"
+            :on-remove="handleRemove"
+            :on-change="handlePreview"
+            list-type="picture"
           >
-            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            <i v-show="!show" class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
         <el-form-item label="姓名">
@@ -58,12 +60,35 @@
         </el-form-item>
       </el-form>
 
+      <!-- 搜索 -->
+      <div class="search">
+        <el-row :gutter="20">
+          <el-col :span="7">
+            <el-input
+              placeholder="请输入文件名"
+              v-model="queryInfo.query"
+              clearable
+              @clear="getShowList"
+            >
+              <el-button
+                slot="append"
+                icon="el-icon-search"
+                @click="getShowList"
+              ></el-button> </el-input
+          ></el-col>
+        </el-row>
+      </div>
+
       <!-- 校友风采列表区 -->
       <el-table :data="showUsersList" border stripe>
         <el-table-column label="#" type="index"></el-table-column>
         <el-table-column label="图片">
           <template slot-scope="scope">
-            <img :src="imgUrl + scope.row.picName" style="width: 150px" />
+            <el-image
+              :src="imgUrl + scope.row.picName"
+              :preview-src-list="[imgUrl + scope.row.picName]"
+              style="width: 150px; height: 150px"
+            ></el-image>
           </template>
         </el-table-column>
         <el-table-column label="姓名" prop="name"></el-table-column>
@@ -193,6 +218,7 @@ export default {
         name: [{ required: true, message: "请输入学院", trigger: "blur" }],
         info: [{ required: true, message: "请输入学院", trigger: "blur" }],
       },
+      show: false,
     };
   },
   methods: {
@@ -205,19 +231,31 @@ export default {
           setTimeout(() => {
             this.$message.success("上传成功");
             this.getShowList();
-          });
+          }, 1000);
         } else {
           this.$message.error("上传失败");
         }
       });
     },
-    async getShowList() {
+    getShowList() {
       getShowInfo(this.queryInfo).then((data) => {
         const { status, result, total } = data.data;
         if (status !== 2001) return this.$message.error("用户列表获取失败");
-        this.showUsersList = result;
+        this.showUsersList = result.reverse();
         this.total = total;
       });
+    },
+    //   头像
+    handlePreview(file, fileList) {
+      if (fileList.length > 0) {
+        this.show = true;
+      }
+      this.$message.success("选择图片成功");
+    },
+    handleRemove(file, fileList) {
+      if (fileList.length < 1) {
+        this.show = false;
+      }
     },
     handleSizeChange(newSize) {
       this.queryInfo.pageSize = newSize;
@@ -272,7 +310,6 @@ export default {
       }
       deleteShowInfo(id).then((data) => {
         const { status } = data.data;
-        console.log(data);
         if (status !== 2001) return this.$message.error("删除用户失败");
         this.$message.success("删除用户成功");
         this.getShowList();

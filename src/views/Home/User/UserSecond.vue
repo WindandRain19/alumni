@@ -16,15 +16,16 @@
               class="avatar-uploader"
               ref="upload"
               :action="actionUrl"
-              :show-file-list="false"
               :limit="1"
               accept=".jpg,.png"
+              :on-change="handlePreview"
+              :on-remove="handleRemove"
+              list-type="picture"
               :multiple="false"
               :auto-upload="false"
               v-if="check_upload"
             >
-              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              <i v-show="show" class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
             <el-image
               :src="imageUrl"
@@ -190,8 +191,9 @@ export default {
       },
       disabled1: true,
       //   头像
+      show: false,
       imageUrl: "",
-      actionUrl: "http://127.0.0.1:5001/Home/stateSecond/upload",
+      actionUrl: process.env.VUE_APP_BASE_API + "/users/uploadHeadPortrait",
       options: [],
       tableData: [],
       button_disabled: true,
@@ -205,6 +207,17 @@ export default {
       getOptions().then((data) => {
         this.options = data.data.data;
       });
+    },
+    handleRemove(file, fileList) {
+      if (fileList.length < 1) {
+        this.show = true;
+      }
+    },
+    handlePreview(file, fileList) {
+      if (fileList.length > 0) {
+        this.$message.warning("每次选图最多为1");
+        this.show = false;
+      }
     },
     getUserInfo() {
       let number = Cookies.get("number");
@@ -228,6 +241,7 @@ export default {
       this.button_disabled = false;
       this.check_upload = true;
       this.check_image = false;
+      this.show = true;
     },
     //   头像
     onSubmit() {
@@ -242,6 +256,7 @@ export default {
           this.check_upload = false;
           this.check_image = true;
           this.$refs.upload.submit();
+          this.getUserInfo();
         }
       });
     },

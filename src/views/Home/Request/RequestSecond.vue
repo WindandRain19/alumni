@@ -12,31 +12,38 @@
       <!-- 搜索与添加区域 -->
       <el-row :gutter="20">
         <el-col :span="7">
-          <el-input
-            placeholder="请输入姓名"
-            v-model="queryInfo.query"
-            clearable
-            @clear="getRequestList"
-          >
-            <el-button
-              slot="append"
-              icon="el-icon-search"
-              @click="getRequestList"
-            ></el-button> </el-input
+        <el-input
+          placeholder="请输入姓名"
+          v-model="queryInfo.query"
+          clearable
+          @clear="getRequestList"
+        >
+          <el-button
+            slot="append"
+            icon="el-icon-search"
+            @click="getRequestList"
+          ></el-button> </el-input
         ></el-col>
       </el-row>
+      <div class="radio-box">
+        <el-radio-group v-model="radio" @change="changeRadio">
+          <el-radio :label="1" border size="medium">全部</el-radio>
+          <el-radio :label="2" border size="medium">未通过</el-radio>
+        </el-radio-group>
+      </div>
+
       <!-- 用户列表去 -->
       <el-table :data="requestList" border stripe>
         <el-table-column label="#" type="index" fixed></el-table-column>
-        <el-table-column label="活动名称" prop="name"></el-table-column>
-        <el-table-column label="负责人" width="120" prop="user"></el-table-column>
-        <el-table-column label="电话" prop="telephone"></el-table-column>
+        <el-table-column label="活动名称" width="200px" prop="name"></el-table-column>
+        <el-table-column label="负责人" width="120px" prop="user"></el-table-column>
+        <el-table-column label="电话"width="200px" prop="telephone"></el-table-column>
         <el-table-column label="活动区域" prop="region"></el-table-column>
-        <el-table-column label="活动日期" width="120" prop="date1"></el-table-column>
-        <el-table-column label="活动具体时间" width="120" prop="date2"></el-table-column>
+        <el-table-column label="活动日期" width="120px" prop="date1"></el-table-column>
+        <el-table-column label="活动具体时间" width="120px" prop="date2"></el-table-column>
         <el-table-column label="活动性质" prop="type"></el-table-column>
-        <el-table-column label="活动简介" width="300" prop="introduction"></el-table-column>
-        <el-table-column label="状态" width="80" prop="status" fixed="right">
+        <el-table-column label="活动简介" width="300px" prop="introduction"></el-table-column>
+        <el-table-column label="状态" width="80px" prop="status" fixed="right">
              <template slot-scope="scope">
         <el-tag
           :type="scope.row.status === '未通过' ? 'danger' : 'success'"
@@ -210,7 +217,7 @@
 </template>
 
 <script>
-import {getRequestInfo,getPersonRequestInfo,updateRequest,deleteRequestInfo,getIdRequestInfo,updateRequestById} from "../../../api/Request"
+import {getRequestInfo,getPersonRequestInfo,updateRequest,deleteRequestInfo,getIdRequestInfo,updateRequestById,getIdStatusInfo} from "../../../api/Request"
 export default {
   created() {
     this.getRequestList();
@@ -265,9 +272,24 @@ export default {
         status:""
       },
       changeFormRules:{},
+      radio:1
     };
   },
   methods: {
+    changeRadio(label){
+      if (label==2) {
+        let type = '未通过'
+        getIdStatusInfo(type).then((data)=>{
+          const {status,result,total} =data.data
+          if (status !== 2001)
+            return this.$message.error("用户列表获取失败");
+          this.requestList = result;
+          this.total = total;
+        })
+      }else{
+        this.getRequestList()
+      }
+    },
     // 获取申请列表
     getRequestList() {
       getRequestInfo(this.queryInfo).then((data)=>{
@@ -301,7 +323,6 @@ export default {
       if (status !== 2001)
         return this.$message.error("查询用户信息失败");
       this.editForm = result[0];
-      console.log(this.editForm);
       })
     },
     // 修改用户信息并提交
@@ -309,7 +330,6 @@ export default {
       this.$refs.editFormRef.validate((valid) => {
         if (!valid) return;
         // 发起添加用户的网络请求
-        console.log(this.editForm,this.editForm.number);
         updateRequest(this.editForm,this.editForm.number).then((data)=>{
           const {status} =data.data
           if (status !== 2001)
@@ -373,5 +393,9 @@ export default {
   padding: 20px;
   margin: 0 auto;
   border-radius: 10px;
+}
+.radio-box{
+  display: flex;
+  justify-content:flex-end;
 }
 </style>

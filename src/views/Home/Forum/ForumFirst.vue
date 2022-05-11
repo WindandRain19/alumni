@@ -20,7 +20,7 @@
       </div>
       <div class="box" v-for="(item,index) in data" :key="index">
         <div class="box_left">
-          <div class="name">{{item.name}}</div>
+          <div class="name"><span>{{item.name}}</span></div>
           <div class="photo">
             <el-image class="photo-img" :src="photoImg + item.photo" :preview-src-list="[photoImg + item.photo]"></el-image>
           </div>
@@ -80,52 +80,60 @@
             <el-upload
             class="upload-demo"
             ref="pic1Upload"
-            list-type="picture-card"
+            list-type="picture"
             :action="actionUrl1"
             :auto-upload="false"
-            :on-change="handleChao"
+            :on-change="handlePreview1"
+            :on-remove="handleRemove1"
             accept=".jpg"
             :limit="1"
               >
+              <i v-show="!show1" class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
           <el-form-item label="图片">
             <el-upload
             class="upload-demo"
             ref="pic2Upload"
-            list-type="picture-card"
+            list-type="picture"
             :action="actionUrl2"
             :auto-upload="false"
-            :on-change="handleChao"
+            :on-change="handlePreview2"
+            :on-remove="handleRemove2"
             accept=".jpg"
             :limit="1"
               >
+              <i v-show="!show2" class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
           <el-form-item label="图片">
             <el-upload
             class="upload-demo"
             ref="pic3Upload"
-            list-type="picture-card"
+            list-type="picture"
             :action="actionUrl3"
             :auto-upload="false"
-            :on-change="handleChao"
+            :on-change="handlePreview3"
+            :on-remove="handleRemove3"
             accept=".jpg"
             :limit="1"
               >
+              <i v-show="!show3" class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
           <el-form-item label="图片">
             <el-upload
             class="upload-demo"
             ref="pic4Upload"
-            list-type="picture-card"
+            list-type="picture"
             :action="actionUrl4"
             :auto-upload="false"
-            :on-change="handleChao"
+            :on-change="handlePreview4"
+            :on-remove="handleRemove4"
             accept=".jpg"
             :limit="1"
               >
+              <i v-show="!show4" class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
         </el-form>
@@ -157,13 +165,16 @@ export default {
       actionUrl3:process.env.VUE_APP_BASE_API+"/fo/uploadPicture3",
       actionUrl4:process.env.VUE_APP_BASE_API+"/fo/uploadPicture4",
       data:{},
-      photoImg:process.env.VUE_APP_UPLOAD_URL_SHOW_PICTURES,
+      photoImg:process.env.VUE_APP_UPLOAD_URL_HEAD_PORTRAIT,
       img1:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE1,
       img2:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE2,
       img3:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE3,
       img4:process.env.VUE_APP_UPLOAD_URL_FORUM_PICTURE4,
       give:"",
-
+      show1:false,
+      show2:false,
+      show3:false,
+      show4:false,
     }
   },
   methods:{
@@ -175,13 +186,58 @@ export default {
         }
       })
     },
-
+        //   头像
+    handleRemove1(file, fileList) {
+      if (fileList.length < 1) {
+        this.show1 = false;
+      }
+    },
+    handlePreview1(file,fileList){
+      if (fileList.length>0) {
+        this.$message.warning('每次选图最多为1');
+        this.show1 = true;
+      }
+    },
+    handleRemove2(file, fileList) {
+      if (fileList.length < 1) {
+        this.show2 = false;
+      }
+    },
+    handlePreview2(file,fileList){
+      if (fileList.length>0) {
+        this.$message.warning('每次选图最多为1');
+        this.show2 = true;
+      }
+    },
+    handleRemove3(file, fileList) {
+      if (fileList.length < 1) {
+        this.show3 = false;
+      }
+    },
+    handlePreview3(file,fileList){
+      if (fileList.length>0) {
+        this.$message.warning('每次选图最多为1');
+        this.show3 = true;
+      }
+    },
+    handleRemove4(file, fileList) {
+      if (fileList.length < 1) {
+        this.show4 = false;
+      }
+    },
+    handlePreview4(file,fileList){
+      if (fileList.length>0) {
+        this.$message.warning('每次选图最多为1');
+        this.show4 = true;
+      }
+    },
     getForum(){
       getForumInfo().then((data)=>{
-        const{status,result} = data.data
+        let{status,result} = data.data
         if (status!==2001) {
           this.$message.error('数据获取失败')
         }else{
+          result = result.reverse()
           this.data=result
         }
       })
@@ -191,11 +247,6 @@ export default {
     },
     showEditDialog1(){
       this.editDialogVisible2=true
-    },
-    handleChao(file,fileList){
-      if (fileList.length>=1) {
-        this.$message.warning('每次选图最多为1');
-      }
     },
     // 文字发布
     fontSubmit(){
@@ -214,7 +265,6 @@ export default {
     picSubmit(){
       let number = Cookies.get('number')
       postPicForum(this.picForm,number).then((data)=>{
-        console.log("postFontForum",data);
         if (data.data.status!==2001) {
           this.$message.error('图片发布失败')
         }else{
@@ -233,6 +283,14 @@ export default {
 </script>
 
 <style scoped>
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
 .box-card-ff{
   width: 1400px;
   background-color: rgba(255, 255, 255, 0.4);
@@ -263,8 +321,8 @@ export default {
 }
 .box_left {
   width: 30%;
-  display: flex;
-  justify-content: flex-start;
+  /* display: flex;
+  justify-content: flex-start; */
   
 }
 .box_right {
@@ -276,21 +334,17 @@ export default {
 .name {
   height: 50px;
   margin-left: 10px;
-  margin-top: 20px;
-  margin-right: 20px;
   line-height: 50px;
-  text-align: right;
+  text-align: left;
   font-size: 28px;
   font-weight: 400;
 }
 .photo {
   width: 120px;
   height: 120px;
-  margin-right: 20px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin: 0 auto;
   border-radius: 50%;
-  padding-top: 30px;
+  padding-bottom: 10px;
 }
 .photo-img {
   width: 100%;
@@ -349,8 +403,4 @@ export default {
   color: rgb(233, 144, 144)
 }
 
-/* .footer_right2 {
-  width: 30%;
-  background-color: blue;
-} */
 </style>
