@@ -276,8 +276,8 @@ export default {
     };
   },
   methods: {
-    changeRadio(label){
-      if (label==2) {
+    changeRadio(radio){
+      if (radio==2) {
         let type = '未通过'
         getIdStatusInfo(type).then((data)=>{
           const {status,result,total} =data.data
@@ -337,7 +337,7 @@ export default {
           this.$message.success("修改用户信息成功");
         });
         this.editDialogVisible = false;
-        this.getRequestList();
+        this.changeRadio(this.radio)
       })
 
     },
@@ -360,7 +360,7 @@ export default {
         const {status} =data.data
         if (status !== 2001) return this.$message.error("删除用户失败");
         this.$message.success("删除用户成功");
-        this.getRequestList();
+        this.changeRadio(this.radio)
       })
     },
     // 审批
@@ -378,7 +378,7 @@ export default {
         if (status !==2001) return this.$message.error("提交失败")
         this.$message.success("审批成功")
         this.changeDialogVisible=false
-        this.getRequestList();
+        this.changeRadio(this.radio)
       })
     }
   },

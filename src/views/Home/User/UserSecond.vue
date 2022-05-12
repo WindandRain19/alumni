@@ -167,6 +167,7 @@
 import { getOptions } from "../../../api/Options";
 import { getUserInfo, UpdateUserInfo } from "../../../api/Users";
 import { getPersonRequestInfo } from "../../../api/Request";
+import { analysisToken } from "@/api/Login";
 import Cookies from "js-cookie";
 export default {
   created() {
@@ -203,7 +204,7 @@ export default {
   },
   methods: {
     // 获得所有学院班级
-    async getOptions() {
+    getOptions() {
       getOptions().then((data) => {
         this.options = data.data.data;
       });
@@ -220,20 +221,27 @@ export default {
       }
     },
     getUserInfo() {
-      let number = Cookies.get("number");
-      getUserInfo(number).then((data) => {
-        const { status, result, msg } = data.data;
-        if (status != 2001) {
+      const Token = Cookies.get("Token");
+      analysisToken(Token).then((data) => {
+        const { number, status, msg } = data.data;
+        if (status !== 2001) {
           this.$message.error(msg);
-        } else {
-          this.infoForm = result[0];
-          this.infoForm.collegeClass = [];
-          this.infoForm.collegeClass.push(result[0].college);
-          this.infoForm.collegeClass.push(result[0].class);
-          this.imageUrl =
-            process.env.VUE_APP_UPLOAD_URL_HEAD_PORTRAIT + result[0].photo;
-          this.$message.success(msg);
+          return;
         }
+        getUserInfo(number).then((data) => {
+          const { status, result, msg } = data.data;
+          if (status != 2001) {
+            this.$message.error(msg);
+          } else {
+            this.infoForm = result[0];
+            this.infoForm.collegeClass = [];
+            this.infoForm.collegeClass.push(result[0].college);
+            this.infoForm.collegeClass.push(result[0].class);
+            this.imageUrl =
+              process.env.VUE_APP_UPLOAD_URL_HEAD_PORTRAIT + result[0].photo;
+            this.$message.success(msg);
+          }
+        });
       });
     },
     change() {
@@ -261,13 +269,20 @@ export default {
       });
     },
     getRequestInfo() {
-      let number = Cookies.get("number");
-      getPersonRequestInfo(number).then((data) => {
-        const { status, result, msg } = data.data;
+      const Token = Cookies.get("Token");
+      analysisToken(Token).then((data) => {
+        const { number, status, msg } = data.data;
         if (status !== 2001) {
-          return this.$message.error(msg);
+          this.$message.error(msg);
+          return;
         }
-        this.tableData = result;
+        getPersonRequestInfo(number).then((data) => {
+          const { status, result, msg } = data.data;
+          if (status !== 2001) {
+            return this.$message.error(msg);
+          }
+          this.tableData = result;
+        });
       });
     },
   },

@@ -13,3 +13,9 @@ export function Login(number, password, img_code, type) {
     data,
   });
 }
+export function analysisToken(Token) {
+  return request({
+    url: "/Login/getNumber/"+Token,
+    method: "get",
+  });
+}

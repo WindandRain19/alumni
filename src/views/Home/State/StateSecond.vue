@@ -37,7 +37,7 @@
         <el-row :gutter="20">
           <el-col :span="7">
             <el-input
-              placeholder="请输入姓名"
+              placeholder="请输入文件名"
               v-model="queryInfo.query"
               clearable
               @clear="getStateList"

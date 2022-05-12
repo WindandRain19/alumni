@@ -582,7 +582,7 @@ export default {
         this.options = data.data.data;
       });
     },
-    async getUserList() {
+    getUserList() {
       getUserInfos(this.queryInfo).then((data) => {
         let { status, result, total } = data.data;
         if (status !== 2001) return this.$message.error("用户列表获取失败");
@@ -707,6 +707,7 @@ export default {
           if (status !== 2001) return this.$message.error("用户权限修改失败");
           this.$message.success("用户权限修改成功");
           this.changeDialogVisible = false;
+          this.getUserList()
         }
       );
     },

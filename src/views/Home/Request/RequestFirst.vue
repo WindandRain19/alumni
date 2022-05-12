@@ -93,6 +93,7 @@
 <script>
 import Cookies from "js-cookie";
 import { postRequest } from "../../../api/Request";
+import { analysisToken } from "@/api/Login";
 export default {
   name: "RequestFirst",
   data() {
@@ -133,17 +134,24 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).catch((err) => err);
-      const number = Cookies.get("number");
-      const requestForm = this.requestForm;
-      if (confirmResult == "confirm") {
-        postRequest(requestForm, number).then((data) => {
-          if (data.data.status !== 2001) {
-            return this.$message.error(data.data.msg);
-          }
-          this.$message.success(data.data.msg);
-          this.$refs.formRef.resetFields();
-        });
-      }
+      const Token = Cookies.get("Token");
+      analysisToken(Token).then((data) => {
+        const { number, status, msg } = data.data;
+        if (status !== 2001) {
+          this.$message.error(msg);
+          return;
+        }
+        const requestForm = this.requestForm;
+        if (confirmResult == "confirm") {
+          postRequest(requestForm, number).then((data) => {
+            if (data.data.status !== 2001) {
+              return this.$message.error(data.data.msg);
+            }
+            this.$message.success(data.data.msg);
+            this.$refs.formRef.resetFields();
+          });
+        }
+      });
     },
   },
 };
@@ -170,7 +178,7 @@ export default {
 }
 /* ====box-card-rf====end */
 
-.button{
+.button {
   margin-top: 50px;
   margin-left: 600px;
 }

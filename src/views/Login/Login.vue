@@ -68,6 +68,7 @@ import Cookies from "js-cookie";
 export default {
   created() {
     sessionStorage.removeItem("activePath");
+    sessionStorage.removeItem("type");
     this.getCookie();
   },
   name: "Login",
@@ -151,6 +152,10 @@ export default {
                   break;
                 case 2001:
                   this.$message.success("登录成功");
+                  this.$store.commit("SET_PERMISSION_ROUTER",this.loginForm.type)
+                  window.sessionStorage.setItem("type",this.loginForm.type)
+                  console.log(this.loginForm.number);
+                  console.log(this.$store);
                   this.$router.push("/Home");
                   break;
                 case 2002:

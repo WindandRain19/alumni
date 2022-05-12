@@ -8,8 +8,18 @@
         </div>
         <span>校友服务管理系统</span>
       </div>
-      <el-button type="info" @click="logout">退出</el-button></el-header
-    >
+      <div>
+        <el-image
+          class="head_portrait"
+          :src="imageUrl"
+          :preview-src-list="[imageUrl]"
+        ></el-image>
+        <div class="head_name">
+          <span>{{ name }}</span>
+        </div>
+        <el-button type="info" @click="logout">退出</el-button>
+      </div>
+    </el-header>
     <el-container>
       <!-- 侧边栏 -->
       <el-aside width="isCollapse ? '64px':'200px'">
@@ -68,11 +78,15 @@
 <script>
 import Cookies from "js-cookie";
 import { getMenuList } from "@/api/Menu";
+import { getUserInfo } from "@/api/Users";
+import { analysisToken } from "@/api/Login";
+
 export default {
   created() {
     this.getMenuList();
     this.activePath = window.sessionStorage.getItem("activePath");
     this.keepStyle();
+    this.getUser();
   },
   name: "Home",
   data() {
@@ -89,6 +103,8 @@ export default {
       isCollapse: "",
       // 被激活的链接地址
       activePath: "",
+      name: "",
+      imageUrl: "",
     };
   },
   methods: {
@@ -120,6 +136,27 @@ export default {
       this.$store.commit("GET_ISCOLLAPSE");
       this.isCollapse = this.$store.state.layout.isCollapse;
     },
+    getUser() {
+      const Token = Cookies.get("Token");
+      analysisToken(Token).then((data) => {
+        const { number, status, msg } = data.data;
+        if (status !== 2001) {
+          this.$message.error(msg);
+          return;
+        }
+        getUserInfo(number).then((data) => {
+          const { status, result, msg } = data.data;
+          if (status != 2001) {
+            this.$message.error(msg);
+          } else {
+            this.name = result[0].name;
+            this.imageUrl =
+              process.env.VUE_APP_UPLOAD_URL_HEAD_PORTRAIT + result[0].photo;
+            this.$message.success(msg);
+          }
+        });
+      });
+    },
   },
 };
 </script>
@@ -145,19 +182,28 @@ export default {
   justify-content: center;
 }
 .logo > div {
-  width: 60px;
-  height: 60px;
+  margin-top: 5px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background-color: #871f27;
 }
 .logo > div > img {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
 }
 .el-header > div > span {
   margin-left: 15px;
 }
-
+.head_portrait {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+.head_name {
+  font-size: 14px;
+  margin: 0 20px 0 10px;
+}
 .home-container {
   display: flex;
   flex-direction: column;
