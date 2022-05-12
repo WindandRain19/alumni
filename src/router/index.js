@@ -31,7 +31,7 @@ const router = new VueRouter({
 
 // 路由导航守卫
 router.beforeEach((to, from, next) => {
-  if (to.path === "/Login") return next();
+  if (to.path === "/Login" || to.path === "/Register") return next();
   const tokenStr = Cookies.get("Token");
   if (!tokenStr) return next("/Login");
   next();
